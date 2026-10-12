@@ -565,6 +565,7 @@ function ingest(col, docs){
     });
     Object.keys(recentDel).forEach(function(k){ var p = k.split('/'); if (p[0] === col && now - recentDel[k] < 60000) delete next[p[1]]; });
   }
+  if (S.got[col] && JSON.stringify(next) === JSON.stringify(S.data[col])) return;
   S.data[col] = next; S.got[col] = true;
   scheduleRender();
 }
@@ -616,13 +617,21 @@ function updateMe(fn){
 }
 
 /* ---------- render plumbing ---------- */
-var rq = false, deferred = false;
-function editing(){ var a = document.activeElement; return !!(a && $app.contains(a) && ((a.tagName === 'INPUT' && a.type !== 'button' && a.type !== 'checkbox') || a.tagName === 'TEXTAREA')); }
+var rq = false, deferred = false, ptrDown = false;
+function editing(){ var a = document.activeElement; return !!(a && $app.contains(a) && ((a.tagName === 'INPUT' && a.type !== 'button' && a.type !== 'checkbox') || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT')); }
 function scheduleRender(){
   if (rq) return; rq = true;
-  requestAnimationFrame(function(){ rq = false; if (editing()) { deferred = true; return; } render(); });
+  requestAnimationFrame(function(){ rq = false; if (editing() || ptrDown) { deferred = true; return; } render(); });
 }
-document.addEventListener('focusout', function(){ setTimeout(function(){ if (deferred && !editing()) { deferred = false; render(); } }, 0); });
+/* Background redraws wait until the person is done: not while a field has focus, and not
+   mid-tap (between pointerdown and the click that follows it), so a tap never lands on a
+   button that a redraw just replaced. */
+function flushDeferred(){ if (deferred && !editing() && !ptrDown) { deferred = false; render(); } }
+document.addEventListener('focusout', function(){ setTimeout(flushDeferred, 0); });
+document.addEventListener('pointerdown', function(){ ptrDown = true; }, true);
+function ptrEnd(){ setTimeout(function(){ ptrDown = false; flushDeferred(); }, 150); }
+document.addEventListener('pointerup', ptrEnd, true);
+document.addEventListener('pointercancel', ptrEnd, true);
 var toastTimer = null;
 function toast(msg){
   $toast.textContent = msg; $toast.hidden = false;
@@ -637,6 +646,12 @@ function setView(v){
 function render(){
   var hw = $app.querySelector('.hm-wrap'); var hmScroll = hw ? hw.scrollLeft : null;
   var st0 = $app.querySelector('.strip'); if (st0) S.stripScroll = st0.scrollLeft;
+  /* Unsaved values in open forms survive any redraw (keyed per form, so switching forms never leaks values). */
+  var kept = {};
+  $app.querySelectorAll('[data-keep]').forEach(function(box){
+    var k = box.getAttribute('data-keep');
+    box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){ kept[k + '|' + el.id] = el.type === 'checkbox' ? el.checked : el.value; });
+  });
   renderTop(); renderNav();
   var html;
   if (S.mode === 'loading') html = '<div class="loading">Loading the board…</div>';
@@ -649,6 +664,13 @@ function render(){
   else if (S.view === 'group') html = viewGroup();
   else html = viewBoard();
   $app.innerHTML = html;
+  $app.querySelectorAll('[data-keep]').forEach(function(box){
+    var k = box.getAttribute('data-keep');
+    box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){
+      var v = kept[k + '|' + el.id]; if (v === undefined) return;
+      if (el.type === 'checkbox') el.checked = v; else el.value = v;
+    });
+  });
   var nhw = $app.querySelector('.hm-wrap');
   if (nhw) {
     if (hmScroll != null) nhw.scrollLeft = hmScroll;
@@ -720,7 +742,7 @@ function viewSetup(){
   var st = settings() || {};
   return modeBanner() + shareCard() + '<h1 class="page-h"' + (S.mode === 'firebase' ? ' style="margin-top:22px"' : '') + '>Set up your group</h1><p class="lead">Name the challenge, pick the first day, and add everyone. You can change all of this later in Group.</p>' +
     (SEED ? '<section class="card" style="margin-top:14px"><div><h2>Start from the spreadsheet</h2><p class="lead" style="margin-top:6px">Loads Merna, Mahmoud, Yasmine, Ali and Adham with the spreadsheet\'s 7-day plan repeated over 4 weeks.</p></div><div class="btnrow"><button class="btn primary" data-act="seed">Load the spreadsheet plan</button></div></section>' : '') +
-    '<form class="card" data-form="setup" style="margin-top:14px">' +
+    '<form class="card" data-form="setup" data-keep="setup" style="margin-top:14px">' +
       '<div class="field"><label for="su-title">Challenge name</label><input id="su-title" name="title" type="text" value="' + esc(st.title || 'Friends Workout') + '" required></div>' +
       '<div class="grid2"><div class="field"><label for="su-start">First day</label><input id="su-start" name="start" type="date" value="' + esc(st.startDate || todayStr()) + '" required></div>' +
       '<div class="field"><label for="su-len">Length in days</label><input id="su-len" name="length" type="number" min="1" max="366" value="' + esc(st.length || 28) + '" required></div></div>' +
@@ -995,7 +1017,7 @@ function viewPlans(){
 function exForm(e, id){
   var levels = (e.levels || []).join('\n');
   var dk = 'delex-' + id;
-  return '<form class="card" data-form="ex" data-id="' + esc(id || '') + '">' +
+  return '<form class="card" data-form="ex" data-id="' + esc(id || '') + '" data-keep="ex-' + esc(id || 'new') + '">' +
     '<div class="grid2"><div class="field"><label for="exf-name">Name</label><input id="exf-name" name="name" type="text" value="' + esc(e.name || '') + '" required></div>' +
     '<div class="field"><label for="exf-kind">Type</label><select id="exf-kind" name="kind">' + KINDS.map(function(k){ return '<option value="' + k + '"' + ((e.kind || 'bodyweight') === k ? ' selected' : '') + '>' + (k === 'stretch' ? 'Stretch' : KIND_LABEL[k]) + '</option>'; }).join('') + '</select></div></div>' +
     '<div class="field"><label for="exf-muscles">Muscles worked</label><input id="exf-muscles" name="muscles" type="text" value="' + esc(e.muscles || '') + '" placeholder="e.g. Chest, triceps"></div>' +
@@ -1049,7 +1071,7 @@ function viewGroup(){
   out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">Who\'s using this device?</h2><p class="lead" style="margin-top:4px">Pick yourself. You can log and edit your own plan; everyone sees everything.</p></div><div class="who">' +
     ms.map(function(m){ return '<button data-act="iam" data-id="' + esc(m.id) + '" aria-pressed="' + (S.me === m.id) + '" style="--mc:' + mc(m) + '"><span class="avatar sm">' + initial(m) + '</span>' + esc(m.name) + '</button>'; }).join('') +
     '</div>' + (S.me ? '<div><button class="linkbtn" data-act="logout">Sign out on this device</button></div>' : '') + '</section>';
-  out += '<form class="card" data-form="settings" style="margin-top:14px"><h2 class="sm">Challenge</h2>' +
+  out += '<form class="card" data-form="settings" data-keep="settings" style="margin-top:14px"><h2 class="sm">Challenge</h2>' +
     '<div class="field"><label for="g-title">Name</label><input id="g-title" name="title" type="text" value="' + esc(st.title || '') + '" required></div>' +
     '<div class="grid2"><div class="field"><label for="g-start">First day</label><input id="g-start" name="start" type="date" value="' + esc(st.startDate || todayStr()) + '" required></div>' +
     '<div class="field"><label for="g-len">Length in days</label><input id="g-len" name="length" type="number" min="1" max="366" value="' + esc(len()) + '" required></div></div>' +
@@ -1304,7 +1326,8 @@ if (window.claude && typeof window.claude.use === 'function') {
 } else {
   S.store = localStore(); S.mode = 'local'; start();
 }
-setInterval(function(){ if (!document.hidden && !editing()) scheduleRender(); }, 60000);
+var lastDay = todayStr();
+setInterval(function(){ if (todayStr() !== lastDay) { lastDay = todayStr(); scheduleRender(); } }, 60000);
 })();
 </script>
 
