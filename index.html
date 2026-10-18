@@ -486,7 +486,9 @@ function claudeStore(db){
       });
     },
     put: function(col,id,data){ return db.doc(col + '/' + id).set(data); },
-    remove: function(col,id){ return db.doc(col + '/' + id).delete(); }
+    remove: function(col,id){ return db.doc(col + '/' + id).delete(); },
+    get: function(col,id){ return db.doc(col + '/' + id).get().then(function(s){ return s.exists ? s.data() : null; }); },
+    listOnce: function(col){ return db.collection(col).get().then(function(s){ return s.docs.filter(function(d){ return d.exists; }).map(function(d){ return {id:d.id, data:d.data()}; }); }); }
   };
 }
 var GK_RE = /^[A-Za-z0-9_-]{20,64}$/, groupKeyMem = null;
@@ -511,7 +513,7 @@ function firebaseStore(cfg, code){
     var out = [];
     function page(token){
       var url = base + col + '?pageSize=300' + (key ? '&' + key : '') + (token ? '&pageToken=' + encodeURIComponent(token) : '');
-      return fetch(url).then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(j){
+      return fetch(url).then(function(r){ if (!r.ok) throw { code: (r.status === 403 || r.status === 401) ? 'invalid_argument' : 'unavailable', message: 'HTTP ' + r.status }; return r.json(); }).then(function(j){
         (j.documents || []).forEach(function(d){
           try { out.push({ id: decodeURIComponent(d.name.split('/').pop()), data: JSON.parse((d.fields && d.fields.json && d.fields.json.stringValue) || '{}') }); } catch(e){}
         });
@@ -536,7 +538,15 @@ function firebaseStore(cfg, code){
     kind:'firebase',
     watch: function(col, cb, every){ W[col] = {cb:cb, err:0, every:every || 30000, last:0}; refresh(col); },
     put: function(col,id,data){ return http('PATCH', col, id, {fields:{json:{stringValue: JSON.stringify(data)}}}); },
-    remove: function(col,id){ return http('DELETE', col, id); }
+    remove: function(col,id){ return http('DELETE', col, id); },
+    get: function(col,id){
+      return fetch(base + col + '/' + encodeURIComponent(id) + (key ? '?' + key : '')).then(function(r){
+        if (r.status === 404) return null;
+        if (!r.ok) throw { code: (r.status === 403 || r.status === 401) ? 'invalid_argument' : 'unavailable', message: 'HTTP ' + r.status };
+        return r.json().then(function(d){ return JSON.parse((d.fields && d.fields.json && d.fields.json.stringValue) || 'null'); });
+      });
+    },
+    listOnce: function(col){ return list(col); }
   };
 }
 function localStore(){
@@ -548,7 +558,9 @@ function localStore(){
     kind:'local',
     watch: function(col, cb){ W[col] = cb; setTimeout(function(){ emit(col); }, 0); },
     put: function(col,id,d){ (data[col] = data[col] || {})[id] = clone(d); persist(); emit(col); return Promise.resolve(); },
-    remove: function(col,id){ if (data[col]) delete data[col][id]; persist(); emit(col); return Promise.resolve(); }
+    remove: function(col,id){ if (data[col]) delete data[col][id]; persist(); emit(col); return Promise.resolve(); },
+    get: function(col,id){ return Promise.resolve(data[col] && data[col][id] ? clone(data[col][id]) : null); },
+    listOnce: function(col){ var c = data[col] || {}; return Promise.resolve(Object.keys(c).map(function(id){ return {id:id, data:clone(c[id])}; })); }
   };
 }
 
@@ -568,6 +580,7 @@ function ingest(col, docs){
   if (S.got[col] && JSON.stringify(next) === JSON.stringify(S.data[col])) return;
   S.data[col] = next; S.got[col] = true;
   scheduleRender();
+  maybeAutoBackup();
 }
 function save(col, id, data){
   if (S.readOnly) { toast(RO_MSG); return; }
@@ -616,9 +629,68 @@ function updateMe(fn){
   save('members', S.me, m);
 }
 
+/* ---------- backups ----------
+   One snapshot per day in the "backups" collection (id = YYYY-MM-DD), taken by the first person
+   to open the app that day; the newest KEEP are kept. "undo" holds the state from just before the
+   last restore. Backups are read on demand (Group tab), never polled. */
+var BK_KEEP = 14, BK_DATE = /^\d{4}-\d{2}-\d{2}$/, autoBackupStarted = false;
+S.bk = {status:'idle', list:[], undo:null};
+function snapshotData(){ return {meta: clone(S.data.meta), members: clone(S.data.members), exercises: clone(S.data.exercises)}; }
+function countsOf(d){
+  var ci = 0, ms = (d && d.members) || {};
+  Object.keys(ms).forEach(function(id){ var lg = (ms[id] && ms[id].log) || {}; Object.keys(lg).forEach(function(k){ ci += Object.keys(lg[k] || {}).length; }); });
+  return {people: Object.keys(ms).length, checkins: ci, plans: Object.keys((d && d.meta) || {}).filter(function(k){ return k.indexOf('plan-') === 0; }).length};
+}
+function makeBackup(){ var d = snapshotData(); return {v:1, at:Date.now(), by:S.me || null, counts:countsOf(d), data:d}; }
+function bkError(e){ S.bk.status = e && e.code === 'invalid_argument' ? 'blocked' : 'error'; scheduleRender(); }
+function loadBackups(){
+  if (!S.store || !S.store.listOnce) return;
+  S.bk.status = 'loading';
+  S.store.listOnce('backups').then(function(docs){
+    S.bk.list = docs.filter(function(d){ return BK_DATE.test(d.id) && d.data && d.data.data; }).sort(function(a,b){ return a.id < b.id ? 1 : -1; });
+    var u = docs.filter(function(d){ return d.id === 'undo' && d.data && d.data.data; })[0];
+    S.bk.undo = u ? u.data : null; S.bk.status = 'ready';
+    if (S.view === 'group') scheduleRender();
+  }, bkError);
+}
+function pruneBackups(){
+  return S.store.listOnce('backups').then(function(docs){
+    var dated = docs.filter(function(d){ return BK_DATE.test(d.id); }).map(function(d){ return d.id; }).sort().reverse();
+    return Promise.all(dated.slice(BK_KEEP).map(function(id){ return S.store.remove('backups', id); }));
+  });
+}
+function maybeAutoBackup(){
+  if (autoBackupStarted || !S.store || !S.store.get || S.readOnly) return;
+  if (!S.got.meta || !S.got.members || !S.got.exercises || !settings() || !members().length) return;
+  autoBackupStarted = true;
+  setTimeout(function(){
+    if (S.readOnly) return;
+    var id = todayStr();
+    S.store.get('backups', id).then(function(doc){
+      if (doc) return;
+      return S.store.put('backups', id, makeBackup()).then(pruneBackups).then(function(){ if (S.view === 'group') loadBackups(); });
+    }).catch(bkError);
+  }, 4000);
+}
+function restoreSnapshot(d){
+  ['meta','members','exercises'].forEach(function(col){
+    var target = (d && d[col]) || {};
+    Object.keys(S.data[col]).forEach(function(id){ if (!Object.prototype.hasOwnProperty.call(target, id)) removeDoc(col, id); });
+    Object.keys(target).forEach(function(id){ save(col, id, clone(target[id])); });
+  });
+  if (S.me && !(d.members || {})[S.me]) { S.me = null; LS.set('fw.me', null); }
+  S.boardDay = null; S.planDay = null; S.applying = null; S.draft = null; S.editEx = null;
+}
+function bkLabel(b){
+  var day = '';
+  try { day = new Date(b.at).toLocaleString(undefined, {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); } catch(e){ day = new Date(b.at).toISOString(); }
+  return day;
+}
+function bkCounts(c){ c = c || {}; return (c.people || 0) + ' people · ' + (c.checkins || 0) + ' check-ins · ' + (c.plans || 0) + ' shared plan' + (c.plans === 1 ? '' : 's'); }
+
 /* ---------- render plumbing ---------- */
 var rq = false, deferred = false, ptrDown = false;
-function editing(){ var a = document.activeElement; return !!(a && $app.contains(a) && ((a.tagName === 'INPUT' && a.type !== 'button' && a.type !== 'checkbox') || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT')); }
+function editing(){ var a = document.activeElement; return !!(a && $app.contains(a) && ((a.tagName === 'INPUT' && a.type !== 'button' && a.type !== 'checkbox' && a.type !== 'file') || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT')); }
 function scheduleRender(){
   if (rq) return; rq = true;
   requestAnimationFrame(function(){ rq = false; if (editing() || ptrDown) { deferred = true; return; } render(); });
@@ -638,7 +710,8 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(function(){ $toast.hidden = true; }, 3200);
 }
 function setView(v){
-  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null;
+  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null; S.pendingRestore = null;
+  if (v === 'group' && S.bk.status === 'ready') loadBackups();
   try { history.replaceState(null, '', '#' + v); } catch(e){}
   render(); window.scrollTo(0, 0);
 }
@@ -664,8 +737,10 @@ function render(){
   else if (S.view === 'group') html = viewGroup();
   else html = viewBoard();
   $app.innerHTML = html;
+  var noKeep = S.noKeep; S.noKeep = null;
   $app.querySelectorAll('[data-keep]').forEach(function(box){
     var k = box.getAttribute('data-keep');
+    if (k === noKeep) return;
     box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){
       var v = kept[k + '|' + el.id]; if (v === undefined) return;
       if (el.type === 'checkbox') el.checked = v; else el.value = v;
@@ -691,6 +766,7 @@ function render(){
     S.stripScroll = strip.scrollLeft;
   }
   if (S.view === 'exercises') applyExFilter();
+  maybeAutoBackup();
 }
 function renderTop(){
   var m = me(), ms = members().slice(0, 5);
@@ -908,34 +984,55 @@ function viewPlan(){
 
 /* ---------- plans ---------- */
 function spread(k, startWd){ var out = []; for (var i=0;i<k;i++){ var w = (startWd + Math.round(i*7/k)) % 7; if (out.indexOf(w) < 0) out.push(w); } return out; }
-function defaultStart(m){ var t = Math.max(dayIdx(), 0); if (m && m.log && m.log[t] && Object.keys(m.log[t]).length) t++; return clamp(t, 0, len()-1); }
+function planDays(p){ return clamp(p.days || p.sessions.length, 1, 7); }
+/* A plan's schedule is pinned to the challenge calendar (Day 1), never to the day you apply it.
+   The start day only decides which days get written, so applying on Day 3 gives the same
+   Day 3+ as applying on Day 1 would have. */
+function defaultWeekdays(p){ return p.weekdays && p.weekdays.length ? p.weekdays.slice() : spread(planDays(p), weekday(0)); }
 function newApply(p){
-  var m = me(), start = defaultStart(m);
-  return {id:p.id, start:start, weekdays: p.weekdays && p.weekdays.length ? p.weekdays.slice() : spread(clamp(p.days || p.sessions.length, 1, 7), weekday(start)), prog:0, mode:p.mode || 'replace', fillRest:true};
+  var start = clamp(Math.max(dayIdx(), 0), 0, len()-1);
+  return {id:p.id, start:start, weekdays: defaultWeekdays(p), prog:0, mode:p.mode || 'replace', fillRest:true};
+}
+/* Which workout (index into sessions) falls on day j, counting training days from Day 1; -1 if j is not a training day. */
+function sessionAt(p, a, j){
+  if (a.weekdays.indexOf(weekday(j)) < 0) return -1;
+  var k = 0; for (var i=0;i<j;i++) if (a.weekdays.indexOf(weekday(i)) >= 0) k++;
+  return k % p.sessions.length;
+}
+/* Items already checked in on a day are kept (with their check-ins); everything else on that day can be replaced. */
+function loggedItems(m, j){
+  var lg = (m.log && m.log[j]) || {};
+  if (!Object.keys(lg).length) return null;
+  return ((m.plan && m.plan[j] && m.plan[j].items) || []).filter(function(it){ return lg[it.id]; });
 }
 function applyPreview(p, a){
-  var m = me(); if (!m) return {set:0, skipped:0, workouts:0};
-  var set = 0, skipped = 0, workouts = 0;
+  var m = me(), out = {set:0, kept:0, workouts:0, first:-1, firstSession:-1};
+  if (!m) return out;
   for (var j=a.start;j<len();j++){
-    var logged = m.log && m.log[j] && Object.keys(m.log[j]).length, on = a.weekdays.indexOf(weekday(j)) >= 0;
-    if (logged) { skipped++; continue; }
-    if (on) { workouts++; set++; } else if (a.mode === 'replace') set++;
+    var on = a.weekdays.indexOf(weekday(j)) >= 0, keep = loggedItems(m, j);
+    if (keep) out.kept += keep.length;
+    if (on) { out.workouts++; out.set++; if (out.first < 0) { out.first = j; out.firstSession = sessionAt(p, a, j); } } else if (a.mode === 'replace') out.set++;
   }
-  return {set:set, skipped:skipped, workouts:workouts};
+  return out;
 }
 function doApply(p, a){
   var n = 0, k = 0;
   updateMe(function(m){
-    for (var j=a.start;j<len();j++){
-      var logged = m.log[j] && Object.keys(m.log[j]).length, on = a.weekdays.indexOf(weekday(j)) >= 0;
-      if (logged) { if (on) k++; continue; }
-      var bump = a.prog ? Math.floor((j - a.start) / (7 * a.prog)) : 0;
+    for (var j=0;j<len();j++){
+      var on = a.weekdays.indexOf(weekday(j)) >= 0;
+      if (j < a.start) { if (on) k++; continue; }   /* keep the rotation counting from Day 1 */
+      var keep = loggedItems(m, j);
+      var bump = a.prog ? Math.floor(j / (7 * a.prog)) : 0;
       if (on) {
         var ses = p.sessions[k % p.sessions.length]; k++;
-        var items = (ses.items || []).map(function(it){ return {id:uid('i'), ex:it.ex, level:capLevel(it.ex, (it.level || 1) + bump)}; });
-        m.plan[j] = {items: a.mode === 'add' ? (m.plan[j].items || []).concat(items) : items}; n++;
+        var base = a.mode === 'add' ? (m.plan[j].items || []) : (keep || []);
+        var have = (keep || []).map(function(it){ return it.ex; });
+        /* An exercise already checked in on this day counts for the new plan too, so it isn't added twice. */
+        var items = (ses.items || []).filter(function(it){ return have.indexOf(it.ex) < 0; })
+          .map(function(it){ return {id:uid('i'), ex:it.ex, level:capLevel(it.ex, (it.level || 1) + bump)}; });
+        m.plan[j] = {items: base.concat(items)}; n++;
       } else if (a.mode === 'replace') {
-        m.plan[j] = {items: a.fillRest && ex('rest') ? [{id:uid('i'), ex:'rest', level:1}] : []};
+        m.plan[j] = {items: keep ? keep : (a.fillRest && ex('rest') ? [{id:uid('i'), ex:'rest', level:1}] : [])};
       }
     }
   });
@@ -961,13 +1058,18 @@ function planCard(p){
     for (var j=Math.max(dayIdx(),0); j<L; j++) opts += '<option value="' + j + '"' + (j === a.start ? ' selected' : '') + '>Day ' + (j+1) + ' · ' + esc(fmt(j, {weekday:'short', day:'numeric', month:'short'})) + '</option>';
     var sw = settings() ? weekday(0) : 0, chips = '';
     for (var q=0;q<7;q++){ var w = (sw + q) % 7; chips += '<button data-act="wd" data-w="' + w + '" aria-pressed="' + (a.weekdays.indexOf(w) >= 0) + '">' + esc(wdName(w)) + '</button>'; }
-    out += '<div class="apply"><div class="field"><span class="lbl">Training days</span><div class="wds" role="group" aria-label="Training days">' + chips + '</div>' +
-      '<span class="hint">Workouts ' + p.sessions.map(function(_, i){ return letter(i); }).join(', ') + ' go on these days in order and keep rotating week after week.</span></div>' +
-      '<div class="grid2"><div class="field"><label for="ap-start">Start on</label><select id="ap-start" data-chg="apstart">' + opts + '</select></div>' +
+    var dflt = defaultWeekdays(p), isDefault = dflt.length === a.weekdays.length && dflt.every(function(w){ return a.weekdays.indexOf(w) >= 0; });
+    var lineUp = isDefault ? '' : ' <button class="linkbtn" data-act="wdspread">Reset to the plan\'s days</button>';
+    out += '<div class="apply"><div class="grid2"><div class="field"><label for="ap-start">Start on</label><select id="ap-start" data-chg="apstart">' + opts + '</select></div>' +
       '<div class="field"><label for="ap-prog">Progression</label><select id="ap-prog" data-chg="approg"><option value="0"' + (a.prog === 0 ? ' selected' : '') + '>Keep the same levels</option><option value="1"' + (a.prog === 1 ? ' selected' : '') + '>Level up every week</option><option value="2"' + (a.prog === 2 ? ' selected' : '') + '>Level up every 2 weeks</option></select></div></div>' +
+      '<div class="field"><span class="lbl">Training days</span><div class="wds" role="group" aria-label="Training days">' + chips + '</div>' +
+      '<span class="hint">Workouts ' + p.sessions.map(function(_, i){ return letter(i); }).join(', ') + ' rotate on these days, counted from Day 1 of the challenge, so the schedule is the same whichever day you start on.' + lineUp + '</span></div>' +
       '<div class="grid2"><div class="field"><label for="ap-mode">Your existing days</label><select id="ap-mode" data-chg="apmode"><option value="replace"' + (a.mode === 'replace' ? ' selected' : '') + '>Replace them</option><option value="add"' + (a.mode === 'add' ? ' selected' : '') + '>Add to them</option></select></div>' +
       (a.mode === 'replace' ? '<label class="check" style="align-self:end;min-height:44px"><input type="checkbox" id="ap-rest" data-chg="aprest"' + (a.fillRest ? ' checked' : '') + '>Mark other days as rest</label>' : '<div></div>') + '</div>' +
-      '<div class="preview">' + (a.weekdays.length ? 'Sets <b>' + pv.workouts + ' workouts</b> from Day ' + (a.start+1) + ' to Day ' + L + (a.mode === 'replace' ? ', replacing ' + pv.set + ' days' : '') + '.' : 'Pick at least one training day.') + (pv.skipped ? ' Skips ' + pv.skipped + ' day' + (pv.skipped === 1 ? '' : 's') + ' you already logged.' : '') + '</div>' +
+      '<div class="preview">' + (a.weekdays.length && pv.first >= 0
+        ? 'First workout: <b>' + (p.sessions.length > 1 ? 'Workout ' + letter(pv.firstSession) + ' on ' : '') + 'Day ' + (pv.first+1) + '</b> (' + esc(fmt(pv.first, {weekday:'short', day:'numeric', month:'short'})) + ')' + (pv.first === dayIdx() ? ', today' : '') + '. ' + (a.start > 0 ? 'Days before Day ' + (a.start+1) + ' stay as they are. ' : '') + 'Sets ' + pv.workouts + ' workouts up to Day ' + L + (a.mode === 'replace' ? ', replacing ' + pv.set + ' days' : '') + '.' +
+          (pv.kept ? (pv.kept === 1 ? ' The exercise you already checked in stays as it is.' : ' The ' + pv.kept + ' exercises you already checked in stay as they are.') : '')
+        : a.weekdays.length ? 'None of these training days fall between the start day and the end of the challenge.' : 'Pick at least one training day.') + '</div>' +
       '<div class="btnrow"><button class="btn primary" data-act="applyplan" data-id="' + esc(p.id) + '"' + (a.weekdays.length ? '' : ' disabled') + '>Apply to my plan</button><button class="btn" data-act="cancelapply">Cancel</button></div></div>';
   }
   return out + '</article>';
@@ -1064,6 +1166,49 @@ function applyExFilter(){
 }
 
 /* ---------- group ---------- */
+function backupCard(){
+  if (!S.store || !S.store.listOnce) return '';
+  if (S.bk.status === 'idle') setTimeout(loadBackups, 0);
+  var b = S.bk, out = '<section class="card" style="margin-top:14px" aria-label="Backups"><div><h2 class="sm">Backups</h2><p class="lead" style="margin-top:4px">The first time anyone opens the app each day, a copy of the whole board is saved: people, plans, check-ins, exercises and shared plans. The last ' + BK_KEEP + ' days are kept.</p></div>';
+  var pr = S.pendingRestore;
+  if (pr) {
+    out += '<div class="banner" role="alert"><p><b>Restore ' + esc(pr.label) + '?</b></p><p style="margin-top:6px">The whole board goes back to that moment, for everyone' + (pr.counts ? ' (' + esc(bkCounts(pr.counts)) + ')' : '') + '. Anything changed after it is lost. The current state is saved first, so you can undo this right after.</p>' +
+      '<div class="btnrow" style="margin-top:10px"><button type="button" class="btn primary" data-act="confirmrestore">Restore</button><button type="button" class="btn" data-act="cancelrestore">Cancel</button></div></div>';
+  }
+  if (b.status === 'blocked') {
+    out += '<div class="banner warn">Backups are switched off: the database rules don\'t allow them yet. ' + (S.mode === 'firebase' ? 'Add <span class="mono">\'backups\'</span> to the list in your Firestore rules (see the setup guide), then reload.' : 'Ask the owner for edit access.') + '</div>';
+  } else if (b.status === 'error') {
+    out += '<p class="hint">Couldn\'t load backups. <button class="linkbtn" data-act="reloadbk">Try again</button></p>';
+  } else if ((b.status === 'loading' && !b.list.length && !b.undo) || b.status === 'idle') {
+    out += '<p class="hint">Loading backups…</p>';
+  } else {
+    if (b.undo) out += '<div class="srow" style="grid-template-columns:minmax(0,1fr) auto;padding:0"><div style="min-width:0"><div class="mname">Before the last restore</div><div class="hint">' + esc(bkLabel(b.undo)) + ' · ' + esc(bkCounts(b.undo.counts)) + '</div></div><button class="btn sm" data-act="restorebk" data-id="undo">Undo restore</button></div>';
+    out += b.list.length ? '<div class="panel">' + b.list.map(function(x){
+      return '<div class="srow" style="grid-template-columns:minmax(0,1fr) auto"><div style="min-width:0"><div class="mname">' + esc(bkLabel(x.data)) + (x.id === todayStr() ? ' <small>(today)</small>' : '') + '</div><div class="hint">' + esc(bkCounts(x.data.counts)) + '</div></div><button class="btn sm" data-act="restorebk" data-id="' + esc(x.id) + '">Restore</button></div>';
+    }).join('') + '</div>' : '<p class="empty-line">No backups yet. The first one is made a few seconds after the app loads.</p>';
+  }
+  var canDownload = S.mode !== 'claude';
+  out += '<div class="btnrow"><button class="btn sm" data-act="backupnow"' + (b.status === 'blocked' || S.readOnly ? ' disabled' : '') + '>Back up now</button>' +
+    (canDownload ? '<button class="btn sm" data-act="downloadbk">Download a copy</button>' : '') +
+    '<label class="btn sm" for="bk-file">Restore from a file</label><input type="file" id="bk-file" accept=".json,application/json" data-chg="restorefile" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></div>' +
+    (canDownload ? '<p class="hint">Backups live in the same database as the board. They undo mistakes made in the app; a downloaded copy also covers losing the database itself.</p>' : '') + '</section>';
+  return out;
+}
+function shiftConfirm(){
+  var ps = S.pendingShift; if (!ps) return '';
+  var d = ps.delta, n = Math.abs(d), days = n + ' day' + (n === 1 ? '' : 's');
+  var newTodayIdx = dayIdx() - d;
+  var todayLine = newTodayIdx >= 0 ? 'Today becomes <b>Day ' + (newTodayIdx + 1) + '</b>. ' : 'Day 1 will be <b>' + esc(fmt(d, {weekday:'short', day:'numeric', month:'short'})) + '</b>. ';
+  var lines = d > 0
+    ? todayLine + 'Everyone\'s planned workouts and check-ins stay on the same calendar dates. ' +
+      'The first ' + days + ' (' + esc(fmt(0, {day:'numeric', month:'short'})) + (n > 1 ? '–' + esc(fmt(n - 1, {day:'numeric', month:'short'})) : '') + ') are removed' +
+      (ps.dropped ? ', including <b>' + ps.dropped + ' check-in' + (ps.dropped === 1 ? '' : 's') + '</b>. Progress, standings and streaks will count from the new Day 1.' : '. Nobody had checked in on those days.')
+    : todayLine + 'Everyone\'s planned workouts and check-ins stay on the same calendar dates, with ' + days + ' added at the start that have nothing planned.';
+  var endIdx = ps.length - 1 + d;
+  return '<div class="banner" role="alert"><p><b>Move the first day ' + (d > 0 ? 'forward' : 'back') + ' ' + days + '?</b></p><p style="margin-top:6px">' + lines +
+    ' The challenge will run for ' + ps.length + ' days, ending ' + esc(fmt(endIdx, {weekday:'short', day:'numeric', month:'short'})) + '.</p>' +
+    '<div class="btnrow" style="margin-top:10px"><button type="button" class="btn primary" data-act="confirmshift">Move the first day</button><button type="button" class="btn" data-act="cancelshift">Cancel</button></div></div>';
+}
 function viewGroup(){
   var st = settings(), ms = members();
   if (!st) return viewSetup();
@@ -1075,7 +1220,8 @@ function viewGroup(){
     '<div class="field"><label for="g-title">Name</label><input id="g-title" name="title" type="text" value="' + esc(st.title || '') + '" required></div>' +
     '<div class="grid2"><div class="field"><label for="g-start">First day</label><input id="g-start" name="start" type="date" value="' + esc(st.startDate || todayStr()) + '" required></div>' +
     '<div class="field"><label for="g-len">Length in days</label><input id="g-len" name="length" type="number" min="1" max="366" value="' + esc(len()) + '" required></div></div>' +
-    '<div class="btnrow"><button class="btn primary" type="submit">Save challenge</button></div></form>';
+    shiftConfirm() +
+    '<div class="btnrow"' + (S.pendingShift ? ' hidden' : '') + '><button class="btn primary" type="submit">Save challenge</button></div></form>';
   var taken = ms.map(function(m){ return (m.color || 0) % NCOL; });
   out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">People</h2><p class="lead" style="margin-top:4px">Tap a color to change it. Rename by editing the name.</p></div>' + ms.map(function(m){
     var rk = 'rmm-' + m.id, cur = (m.color || 0) % NCOL, pal = '';
@@ -1090,6 +1236,7 @@ function viewGroup(){
   }).join('') +
     '<form data-form="addmember" class="btnrow" style="flex-wrap:nowrap"><input type="text" id="g-newname" name="name" placeholder="Add a person" aria-label="New person\'s name" required style="flex:1"><button class="btn" type="submit">Add</button></form></section>';
   out += shareCard();
+  out += backupCard();
   var where = S.mode === 'claude' ? 'Saved in this shared Claude page. Everyone with edit access sees changes live.'
     : S.mode === 'firebase' ? 'Saved to the Firebase project <span class="mono">' + esc(CONFIG.firebaseProject) + '</span>. Other people\'s check-ins appear within about 15 seconds, or right away when you come back to the tab.'
     : 'Saved in this browser only (demo mode).';
@@ -1173,6 +1320,7 @@ var A = {
   useplan: function(b){ var p = findPlan(b.dataset.id); if (!p || !me()) return; S.applying = newApply(p); render(); },
   cancelapply: function(){ S.applying = null; render(); },
   wd: function(b){ var a = S.applying; if (!a) return; var w = +b.dataset.w, i = a.weekdays.indexOf(w); if (i >= 0) a.weekdays.splice(i, 1); else a.weekdays.push(w); render(); },
+  wdspread: function(){ var a = S.applying, p = a && findPlan(a.id); if (!p) return; a.weekdays = defaultWeekdays(p); render(); },
   applyplan: function(b){
     var p = findPlan(b.dataset.id), a = S.applying; if (!p || !a || !a.weekdays.length) return;
     var n = doApply(p, a); S.applying = null; S.planDay = a.start;
@@ -1221,6 +1369,54 @@ var A = {
   color: function(b){ S.colorFor = S.colorFor === b.dataset.id ? null : b.dataset.id; render(); },
   setcolor: function(b){ var m = clone(S.data.members[b.dataset.id]); m.color = +b.dataset.c; S.colorFor = null; save('members', b.dataset.id, m); },
   rmmember: function(b){ var id = b.dataset.id; if (S.me === id) { S.me = null; LS.set('fw.me', null); } removeDoc('members', id); },
+  confirmshift: function(){
+    var ps = S.pendingShift; if (!ps) return;
+    var d = ps.delta;
+    /* Every plan day and check-in keeps its calendar date: index i becomes i - d.
+       Moving later drops days before the new first day; moving earlier adds empty days in front. */
+    members().forEach(function(x){
+      var m = clone(S.data.members[x.id]), plan = m.plan || [], log = m.log || {}, nl = {};
+      if (d > 0) plan = plan.slice(d);
+      else { var pre = []; for (var i=0;i<-d;i++) pre.push({items:[]}); plan = pre.concat(plan); }
+      Object.keys(log).forEach(function(k){ var j = +k - d; if (j >= 0) nl[j] = log[k]; });
+      m.plan = plan; m.log = nl;
+      save('members', x.id, m);
+    });
+    var st = clone(settings()); st.title = ps.title; st.length = ps.length; st.startDate = ps.start;
+    save('meta', 'settings', st);
+    S.pendingShift = null; S.boardDay = null; S.planDay = null;
+    toast('First day moved. Everyone\'s plans stay on the same dates.');
+  },
+  cancelshift: function(){ S.pendingShift = null; S.noKeep = 'settings'; render(); },
+  /* backups */
+  reloadbk: function(){ loadBackups(); render(); },
+  backupnow: function(){
+    S.store.put('backups', todayStr(), makeBackup()).then(pruneBackups).then(function(){ toast('Backup saved'); loadBackups(); }, bkError);
+  },
+  restorebk: function(b){
+    var id = b.dataset.id, doc = id === 'undo' ? S.bk.undo : (S.bk.list.filter(function(x){ return x.id === id; })[0] || {}).data;
+    if (!doc || !doc.data) return;
+    S.pendingRestore = {label: id === 'undo' ? 'the state from before the last restore' : 'the backup from ' + bkLabel(doc), counts: doc.counts, data: doc.data};
+    render();
+  },
+  cancelrestore: function(){ S.pendingRestore = null; render(); },
+  confirmrestore: function(b){
+    var pr = S.pendingRestore; if (!pr) return;
+    b.disabled = true;
+    /* Save the current state as "undo" first; only restore once that copy is safely stored. */
+    S.store.put('backups', 'undo', makeBackup()).then(function(){
+      restoreSnapshot(pr.data); S.pendingRestore = null;
+      toast('Restored. You can undo this in Group → Backups.');
+      loadBackups(); render();
+    }, function(e){ bkError(e); toast("Couldn't save the current state first, so nothing was restored."); b.disabled = false; });
+  },
+  downloadbk: function(){
+    try {
+      var blob = new Blob([JSON.stringify(makeBackup(), null, 1)], {type:'application/json'});
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'workouts-backup-' + todayStr() + '.json';
+      document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    } catch(e){ toast("Couldn't create the file on this device."); }
+  },
   newgroup: function(){ setGroupKey(newGroupKey()); startFirebase(); setView('board'); toast('Group created. Send everyone the invite link.'); },
   copylink: function(){
     var el = document.getElementById('share-link'); if (!el) return;
@@ -1240,6 +1436,20 @@ var C = {
     var c = clone(m); c.name = v; save('members', el.dataset.id, c);
   },
   apstart: function(el){ if (S.applying) { S.applying.start = +el.value; render(); } },
+  restorefile: function(el){
+    var f = el.files && el.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      var obj = null; try { obj = JSON.parse(r.result); } catch(e){}
+      var d = obj && obj.data && obj.data.members ? obj.data : (obj && obj.members ? obj : null);
+      if (!d || typeof d.members !== 'object') { toast('That file isn\'t a workout backup.'); el.value = ''; return; }
+      d.meta = d.meta || {}; d.exercises = d.exercises || {};
+      S.pendingRestore = {label: 'the file ' + f.name + (obj.at ? ' (saved ' + bkLabel(obj) + ')' : ''), counts: countsOf(d), data: d};
+      el.value = ''; render();
+    };
+    r.onerror = function(){ toast("Couldn't read that file."); };
+    r.readAsText(f);
+  },
   approg: function(el){ if (S.applying) { S.applying.prog = +el.value; render(); } },
   apmode: function(el){ if (S.applying) { S.applying.mode = el.value; render(); } },
   aprest: function(el){ if (S.applying) { S.applying.fillRest = el.checked; render(); } },
@@ -1264,7 +1474,15 @@ var F = {
     toast('Board created');
   },
   settings: function(f){
-    var st = clone(settings()); st.title = f.title.value.trim() || st.title; st.startDate = f.start.value || st.startDate; st.length = clamp(parseInt(f.length.value,10) || len(), 1, 366);
+    var st = clone(settings()); st.title = f.title.value.trim() || st.title; st.length = clamp(parseInt(f.length.value,10) || len(), 1, 366);
+    var newStart = f.start.value || st.startDate, delta = Math.round((parseD(newStart) - parseD(st.startDate)) / DAY);
+    if (delta) {
+      /* Moving the first day re-numbers every day. Confirm first, showing what falls off the front. */
+      var dropped = 0;
+      if (delta > 0) members().forEach(function(m){ Object.keys(m.log || {}).forEach(function(k){ if (+k < delta) dropped += Object.keys(m.log[k]).length; }); });
+      S.pendingShift = {title: st.title, length: st.length, start: newStart, delta: delta, dropped: dropped};
+      render(); return;
+    }
     save('meta', 'settings', st); toast('Challenge saved');
   },
   addmember: function(f){
