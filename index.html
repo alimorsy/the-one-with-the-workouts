@@ -85,15 +85,16 @@ p{margin:0}
 .dateline{color:var(--muted);font-weight:600}
 .dateline b{color:var(--fg)}
 .teambar{display:flex;gap:3px;height:18px}
-.teambar .seg{position:relative;flex:var(--f) 1 0;min-width:6px;border-radius:5px;overflow:hidden;background:color-mix(in srgb,var(--mc) 20%,var(--surface-2))}
+.teambar .seg{position:relative;flex:var(--f) 1 0;min-width:6px;border-radius:5px;overflow:hidden;background:var(--surface-2);background:color-mix(in srgb,var(--mc) 20%,var(--surface-2))}
 .teambar .seg i{position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--mc)}
 .teambar.none{background:var(--surface-2);border-radius:5px}
 .teamlabel{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--muted);flex-wrap:wrap}
 .teamlabel b{color:var(--fg);font-variant-numeric:tabular-nums}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;min-width:0}
-.stat b{display:block;font-family:var(--f-display);font-size:1.55rem;font-weight:850;font-stretch:110%;font-variant-numeric:tabular-nums;line-height:1.1}
-.stat span{font-size:.74rem;color:var(--muted);font-weight:600}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 10px;min-width:0}
+.stat b{display:block;font-family:var(--f-display);font-size:1.3rem;font-weight:850;font-stretch:110%;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{display:block;font-size:.72rem;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-h.tight{margin-top:18px}
 
 .sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:28px 0 10px}
 .sec-h h2{font-family:var(--f-display);font-weight:800;font-stretch:115%;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em}
@@ -136,24 +137,35 @@ button.chip:active{transform:scale(.97)}
 .linkbtn{border:0;background:none;color:var(--accent);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
 
 /* heatmap */
-.hm-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);-webkit-overflow-scrolling:touch;position:relative}
-.hm{display:grid;gap:4px;padding:12px 12px 12px 0;width:max-content;align-items:center;position:relative}
-.hm-name,.hm-corner{position:sticky;left:0;z-index:1;background:var(--surface);height:100%;display:flex;align-items:center;gap:6px;padding-left:12px;padding-right:8px;font-weight:600;font-size:.8rem;white-space:nowrap;max-width:7.5rem;overflow:hidden;text-overflow:ellipsis}
-.hm-h{font-size:.66rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.hm-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 10px 10px 0;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hm-wrap::-webkit-scrollbar{display:none}
+.hm-box{position:relative;min-width:0}
+.hm-more{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center;padding:0;box-shadow:0 1px 4px color-mix(in srgb,var(--fg) 18%,transparent)}
+.hm-more svg{width:12px;height:12px}
+.hm-more.l{left:calc(var(--namew,40px) - 4px)}
+.hm-more.r{right:-6px}
+.hm{display:grid;column-gap:2px;row-gap:3px;align-items:center;width:max-content}
+.hm-name,.hm-corner{position:sticky;left:0;z-index:2;align-self:stretch;background:var(--surface);box-shadow:3px 0 0 var(--surface);display:flex;align-items:center;gap:6px;padding-left:10px;padding-right:6px;font-weight:600;font-size:.8rem;white-space:nowrap}
+.hm-name .avatar.sm{width:26px;height:18px;border-radius:9px;font-size:.62rem;letter-spacing:.02em}
+@media (min-width:560px){ .hm-name .avatar.sm{height:22px;border-radius:11px} }
+.hm-name .full{display:none}
+@media (min-width:560px){ .hm-name .full{display:inline;max-width:6.5rem;overflow:hidden;text-overflow:ellipsis} }
+.hm-h{font-size:.62rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;line-height:1.5}
 .hm-h.wk{color:var(--fg);font-weight:800}
 .hm-h.today{color:var(--accent);font-weight:800}
-.cell{width:24px;height:24px;border-radius:6px;border:0;padding:0;position:relative;background:color-mix(in srgb,var(--mc) var(--p),var(--surface-2))}
+.cell{width:100%;min-width:0;height:18px;border-radius:3px;border:0;padding:0;position:relative;background:var(--surface-2);background:color-mix(in srgb,var(--mc) var(--p),var(--surface-2))}
+@media (min-width:560px){ .cell{height:22px;border-radius:4px} }
 .cell.future{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
-.cell.rest{background:repeating-linear-gradient(135deg,var(--line) 0 2px,transparent 2px 6px);box-shadow:inset 0 0 0 1px var(--line)}
+.cell.rest{background:repeating-linear-gradient(135deg,var(--line) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px var(--line)}
 .cell.none{background:var(--surface-2);opacity:.45}
 .cell.missed{background:color-mix(in srgb,var(--skip) 28%,var(--surface-2))}
-.cell.late::after{content:"";position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 1.5px var(--fg)}
-.cell.today{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--fg)}
-.cell.sel{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.cell.late::after{content:"";position:absolute;right:1px;top:1px;width:5px;height:5px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 1px var(--fg)}
+.cell.today{box-shadow:inset 0 0 0 2px var(--fg)}
+.cell.sel{box-shadow:inset 0 0 0 2px var(--accent)}
 .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.75rem;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend .cell{width:14px;height:14px;border-radius:4px;--mc:var(--muted);display:inline-block}
-.legend .cell.late::after{width:5px;height:5px;right:2px;top:2px}
+.legend .cell.late::after{width:4px;height:4px;right:1px;top:1px}
 
 /* standings */
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
@@ -184,7 +196,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .btn.sm{min-height:36px;padding:0 12px;font-size:.85rem}
 .btn:disabled{opacity:.45;cursor:default}
 .btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.banner{border-radius:var(--r-sm);padding:10px 12px;font-size:.85rem;background:color-mix(in srgb,var(--accent) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line))}
+.banner{border-radius:var(--r-sm);padding:10px 12px;font-size:.85rem;background:var(--surface);border:1px solid var(--line);background:color-mix(in srgb,var(--accent) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line))}
 .banner.warn{background:color-mix(in srgb,var(--skip) 9%,var(--surface));border-color:color-mix(in srgb,var(--skip) 35%,var(--line))}
 .who{display:flex;flex-wrap:wrap;gap:8px}
 .who button{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 14px 4px 4px;font-weight:700;min-height:42px}
@@ -212,6 +224,9 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .item{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;min-width:0}
 .item-top{display:grid;grid-template-columns:minmax(0,1fr) 7.5rem 44px;gap:8px;align-items:center}
 .item-top.nolvl{grid-template-columns:minmax(0,1fr) 44px}
+.item-top.locked{grid-template-columns:minmax(0,1fr) 7.5rem}
+.item-top.locked.nolvl{grid-template-columns:minmax(0,1fr)}
+select:disabled{opacity:.75;background-image:none;padding-right:12px}
 .item-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .item-desc{color:var(--muted);font-size:.86rem;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
 .state{font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
@@ -270,6 +285,13 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 @media (min-width:760px){.toast{bottom:24px}}
 .loading{padding:48px 0;text-align:center;color:var(--muted)}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em}
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .cell.part{background:var(--mc);opacity:.5}
+  .cell.full{background:var(--mc)}
+  .cell.missed{background:var(--skip);opacity:.35}
+  .nav{background:var(--bg)}
+  .chip.done,.chip.late{background:var(--surface)}
+}
 @media (prefers-reduced-motion:no-preference){
   .chip,.cell,.dbtn,.btn{transition:transform .12s ease,background-color .2s ease,border-color .2s ease}
   .teambar .seg i,.bar i{transition:width .35s ease}
@@ -280,6 +302,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 <nav class="nav" id="nav" aria-label="Sections"></nav>
 <main class="wrap" id="app"><div class="loading">Loading the board…</div></main>
 <div class="toast" id="toast" role="status" hidden></div>
+<input type="file" id="bk-file" accept=".json,application/json" data-chg="restorefile" tabindex="-1" aria-hidden="true" style="position:fixed;left:-100px;top:0;width:1px;height:1px;opacity:0">
 
 <script>
 (function(){
@@ -370,7 +393,12 @@ function clone(o){ return JSON.parse(JSON.stringify(o || {})); }
 function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
 function pad(n){ return (n < 10 ? '0' : '') + n; }
 function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-function uid(p){ return (p||'i') + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3); }
+function uid(p){
+  if (uidReplay && uidReplay.length) return uidReplay.shift();
+  var v = (p||'i') + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3);
+  if (uidRec) uidRec.push(v);
+  return v;
+}
 function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
 function uniqueId(base, existing, prefix){ var b = slug(base) || uid(prefix); var id = b, n = 2; while (existing[id]) id = b + '-' + (n++); return id; }
 function todayStr(){ var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
@@ -383,6 +411,7 @@ function weekday(i){ return dateOf(i).getUTCDay(); }
 function fmt(i, o){ try { return dateOf(i).toLocaleDateString(undefined, Object.assign({timeZone:'UTC'}, o)); } catch(e){ return ''; } }
 function wdName(w){ try { return new Date(Date.UTC(2026, 9, 11 + w)).toLocaleDateString(undefined, {weekday:'short', timeZone:'UTC'}); } catch(e){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][w]; } }
 function canLog(d){ var t = dayIdx(); return d >= 0 && (d === t || d === t - 1); }
+function canEditPlan(d){ return d >= dayIdx(); }
 var IC = {
   board:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 14h3M7.5 17h6"/></svg>',
@@ -416,10 +445,11 @@ function exMap(){
   for (id in CATALOG) out[id] = Object.assign({}, CATALOG[id]);
   for (id in S.data.exercises) {
     var d = S.data.exercises[id];
-    if (d && d.deleted) { delete out[id]; continue; }
+    if (d && d.deleted && id !== 'rest') { delete out[id]; continue; }
     out[id] = Object.assign({}, out[id] || {}, d);
   }
   for (id in out) { var k = out[id].kind; if (KINDS.indexOf(k) < 0) out[id].kind = 'bodyweight'; out[id].levels = out[id].levels || []; }
+  if (out.rest) { out.rest.kind = 'rest'; out.rest.levels = []; delete out.rest.deleted; }
   exCache = {src:S.data.exercises, map:out};
   return out;
 }
@@ -431,12 +461,12 @@ function exList(){
 }
 function refLink(e){
   if (!e || e.kind === 'rest') return null;
-  if (e.url) return {href:e.url, label:'How to do it'};
+  if (e.url && /^https?:\/\//i.test(e.url)) return {href:e.url, label:'How to do it'};
   if (e.ref) return {href:'https://www.strengthlog.com/' + e.ref + '/', label:'Form and muscles'};
   return {href:'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.name + (e.kind === 'stretch' ? ' stretch' : ' exercise') + ' how to'), label:'Watch how'};
 }
 function refHtml(e){ var r = refLink(e); return r ? '<a class="reflink" href="' + esc(r.href) + '" target="_blank" rel="noopener">' + esc(r.label) + ' ↗</a>' : ''; }
-function isRest(it){ var e = ex(it.ex); return !!(e && e.kind === 'rest'); }
+function isRest(it){ if (it.ex === 'rest') return true; var e = ex(it.ex); return !!(e && e.kind === 'rest'); }
 function capLevel(exId, l){ var e = ex(exId); var n = e && e.levels ? e.levels.length : 0; return n ? clamp(l || 1, 1, n) : 1; }
 function lvlOf(it){ var e = ex(it.ex); var n = e && e.levels ? e.levels.length : 0; return n ? clamp(it.level || 1, 1, n) : 0; }
 function exName(it){ var e = ex(it.ex); return e ? e.name : 'Removed exercise'; }
@@ -494,7 +524,7 @@ function claudeStore(db){
 var GK_RE = /^[A-Za-z0-9_-]{20,64}$/, groupKeyMem = null;
 function groupKey(){
   var m = (location.hash || '').match(/^#k=([A-Za-z0-9_-]{20,64})$/);
-  if (m) { setGroupKey(m[1]); try { history.replaceState(null, '', location.pathname + location.search + '#board'); } catch(e){} return m[1]; }
+  if (m) { setGroupKey(m[1]); return m[1]; }
   var k = groupKeyMem || LS.get('fw.group');
   return k && GK_RE.test(k) ? k : null;
 }
@@ -508,12 +538,23 @@ function shareLink(){ var k = groupKey(); return k ? location.origin + location.
 function firebaseStore(cfg, code){
   var base = 'https://firestore.googleapis.com/v1/projects/' + encodeURIComponent(cfg.firebaseProject) + '/databases/(default)/documents/groups/' + code + '/';
   var key = cfg.firebaseApiKey ? 'key=' + encodeURIComponent(cfg.firebaseApiKey) : '';
-  var W = {};
+  var W = {}, lastInput = Date.now(), lastPoke = {};
+  ['pointerdown','keydown'].forEach(function(t){ document.addEventListener(t, function(){
+    /* Back after a quiet spell: fetch right away instead of waiting for the slow interval. */
+    if (Date.now() - lastInput > 60000) for (var c in W) refresh(c);
+    lastInput = Date.now();
+  }, true); });
+  function codeFor(status){ return (status === 403 || status === 401) ? 'invalid_argument' : status === 429 ? 'rate_limited' : 'unavailable'; }
+  /* Every request gives up after 15s, so a hung connection can't stall the save queue or a poll. */
+  function req(url, init){
+    var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, t = ctl ? setTimeout(function(){ ctl.abort(); }, 15000) : null;
+    return fetch(url, Object.assign({}, init || {}, ctl ? {signal: ctl.signal} : {})).then(function(r){ clearTimeout(t); return r; }, function(e){ clearTimeout(t); throw {code:'unavailable', message:String(e)}; });
+  }
   function list(col){
     var out = [];
     function page(token){
       var url = base + col + '?pageSize=300' + (key ? '&' + key : '') + (token ? '&pageToken=' + encodeURIComponent(token) : '');
-      return fetch(url).then(function(r){ if (!r.ok) throw { code: (r.status === 403 || r.status === 401) ? 'invalid_argument' : 'unavailable', message: 'HTTP ' + r.status }; return r.json(); }).then(function(j){
+      return req(url).then(function(r){ if (!r.ok) throw { code: codeFor(r.status), message: 'HTTP ' + r.status }; return r.json(); }).then(function(j){
         (j.documents || []).forEach(function(d){
           try { out.push({ id: decodeURIComponent(d.name.split('/').pop()), data: JSON.parse((d.fields && d.fields.json && d.fields.json.stringValue) || '{}') }); } catch(e){}
         });
@@ -523,32 +564,45 @@ function firebaseStore(cfg, code){
     return page('');
   }
   function refresh(col){
-    var w = W[col]; if (!w) return; w.last = Date.now();
-    list(col).then(function(docs){ w.err = 0; w.cb(docs); }, function(){ if (++w.err === 2) toast("Can't reach the database. Retrying…"); });
+    var w = W[col]; if (!w) return; w.last = Date.now(); var seq = ++w.seq;
+    list(col).then(function(docs){
+      if (seq < w.applied) return;   /* an older poll that came back late: a newer one is already applied */
+      w.applied = seq; w.err = 0; w.cb(docs);
+    }, function(e){ if (e && e.code === 'rate_limited') quotaHit(); else if (++w.err === 2) toast("Can't reach the database. Retrying…"); });
   }
+  /* Poll at full speed only while someone is using the page; a tab left open in the background
+     drops to every 5 minutes, so it can't eat the free daily read quota. */
+  function active(){ return Date.now() - lastInput < 10 * 60000; }
+  setInterval(function(){
+    if (document.hidden) return;
+    var now = Date.now(), on = active();
+    for (var c in W) { var every = on ? W[c].every : Math.max(W[c].every, 300000); if (now - W[c].last >= every) refresh(c); }
+  }, 3000);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) { lastInput = Date.now(); for (var c in W) refresh(c); } });
+  window.addEventListener('focus', function(){ lastInput = Date.now(); for (var c in W) if (Date.now() - W[c].last > 5000) refresh(c); });
   function http(method, col, id, body){
-    return fetch(base + col + '/' + encodeURIComponent(id) + (key ? '?' + key : ''), {
+    return req(base + col + '/' + encodeURIComponent(id) + (key ? '?' + key : ''), {
       method: method, headers: body ? {'Content-Type':'application/json'} : undefined, body: body ? JSON.stringify(body) : undefined
-    }).then(function(r){ if (!r.ok) throw { code: (r.status === 403 || r.status === 401) ? 'invalid_argument' : 'unavailable', message: 'HTTP ' + r.status }; });
+    }).then(function(r){ if (!r.ok) throw { code: codeFor(r.status), message: 'HTTP ' + r.status }; });
   }
-  setInterval(function(){ if (document.hidden) return; var now = Date.now(); for (var c in W) if (now - W[c].last >= W[c].every) refresh(c); }, 3000);
-  document.addEventListener('visibilitychange', function(){ if (!document.hidden) for (var c in W) refresh(c); });
-  window.addEventListener('focus', function(){ for (var c in W) if (Date.now() - W[c].last > 5000) refresh(c); });
   return {
     kind:'firebase',
-    watch: function(col, cb, every){ W[col] = {cb:cb, err:0, every:every || 30000, last:0}; refresh(col); },
+    watch: function(col, cb, every){ W[col] = {cb:cb, err:0, every:every || 30000, last:0, seq:0, applied:0}; refresh(col); },
+    poke: function(col){ if (W[col] && Date.now() - (lastPoke[col] || 0) > 20000) { lastPoke[col] = Date.now(); refresh(col); } },
     put: function(col,id,data){ return http('PATCH', col, id, {fields:{json:{stringValue: JSON.stringify(data)}}}); },
     remove: function(col,id){ return http('DELETE', col, id); },
     get: function(col,id){
-      return fetch(base + col + '/' + encodeURIComponent(id) + (key ? '?' + key : '')).then(function(r){
+      return req(base + col + '/' + encodeURIComponent(id) + (key ? '?' + key : '')).then(function(r){
         if (r.status === 404) return null;
-        if (!r.ok) throw { code: (r.status === 403 || r.status === 401) ? 'invalid_argument' : 'unavailable', message: 'HTTP ' + r.status };
+        if (!r.ok) throw { code: codeFor(r.status), message: 'HTTP ' + r.status };
         return r.json().then(function(d){ return JSON.parse((d.fields && d.fields.json && d.fields.json.stringValue) || 'null'); });
       });
     },
     listOnce: function(col){ return list(col); }
   };
 }
+var quotaToastAt = 0;
+function quotaHit(){ S.quota = true; if (Date.now() - quotaToastAt > 3600000) { quotaToastAt = Date.now(); toast('The database\'s free daily limit is used up. Changes are kept and save once it resets.'); } scheduleRender(); }
 function localStore(){
   var KEY = 'fw.local', data = {}, W = {};
   try { data = JSON.parse(LS.get(KEY) || '{}') || {}; } catch(e){ data = {}; }
@@ -564,69 +618,147 @@ function localStore(){
   };
 }
 
-/* ---------- sync: ingest + write queue ---------- */
-var recent = {}, recentDel = {}, queues = {};
+/* ---------- sync: changes as edits, a per-document queue, retries ----------
+   Every change is an edit: a function from the stored document to the new one (undefined = no change,
+   null = delete). The edit is applied to the local copy right away so the screen updates. A queue per
+   document then re-reads the latest stored copy, applies all waiting edits in order and writes the result,
+   so an older copy on this device never overwrites a newer change made elsewhere (a second device, or
+   someone renaming you while you check in).
+   A failed write stays queued and retries with backoff, when the connection returns, and when the app is
+   opened again (waiting documents are kept in localStorage). Until then the local copy, rebuilt on top of
+   each freshly polled version, is what the screen shows, and a banner counts the changes waiting. */
+var queues = {}, recent = {}, uidRec = null, uidReplay = null, editConflict = false;
+function pendingKey(){ return 'fw.pending:' + (S.mode === 'firebase' ? (groupKey() || '') : S.mode); }
+function pendingLoad(){ try { return JSON.parse(LS.get(pendingKey()) || '{}') || {}; } catch(e){ return {}; } }
+function pendingSet(k, v){ if (S.mode === 'local') return; var p = pendingLoad(); if (v === undefined) delete p[k]; else p[k] = {d:v, at:Date.now()}; LS.set(pendingKey(), Object.keys(p).length ? JSON.stringify(p) : null); }
+function waiting(){ var n = 0, stuck = false; for (var k in queues) { var q = queues[k]; if (q.fns.length) { n++; if (q.tries) stuck = true; } } return {n:n, stuck:stuck}; }
+/* Run an edit; uid() calls inside it are recorded the first time and replayed when the queue re-runs it,
+   so ids created locally (and maybe already checked in) match the ids that get stored. */
+function runEdit(e, doc){
+  if (e.ids) { uidReplay = e.ids.slice(); } else { uidRec = []; }
+  try { return e.fn(doc); }
+  finally { if (!e.ids) e.ids = uidRec; uidRec = null; uidReplay = null; }
+}
+function applyEdits(doc, edits){
+  var d = doc === undefined ? null : doc;
+  for (var i=0;i<edits.length;i++){ var r = runEdit(edits[i], d === null ? null : d); if (r !== undefined) d = r; }
+  return d;
+}
+function setLocal(col, id, doc){
+  S.data[col] = Object.assign({}, S.data[col]);
+  if (doc === null || doc === undefined) delete S.data[col][id]; else S.data[col][id] = doc;
+}
+function mutate(col, id, fn){
+  if (S.readOnly) { toast(RO_MSG); return; }
+  var k = col + '/' + id, q = queues[k] || (queues[k] = {col:col, id:id, fns:[], running:false, tries:0, timer:null});
+  var e = {fn:fn};
+  var cur = S.data[col][id] ? clone(S.data[col][id]) : null;
+  var next = runEdit(e, cur);
+  if (next !== undefined) { if (next) next.updatedAt = Date.now(); setLocal(col, id, next); }
+  q.fns.push(e);
+  pendingSet(k, next === undefined ? (S.data[col][id] || null) : next);
+  recent[k] = Date.now();
+  kick(q);
+  render();
+}
+/* Whole-document replace (new docs, restores, edited plans/exercises) and field-level patch. */
+function save(col, id, data){ var d = clone(data); mutate(col, id, function(){ return clone(d); }); }
+function removeDoc(col, id){ mutate(col, id, function(){ return null; }); }
+function patch(col, id, fields){ var f = clone(fields); mutate(col, id, function(doc){ if (!doc) return undefined; return Object.assign(doc, clone(f)); }); }
+function kick(q){
+  if (q.running || !q.fns.length || !S.store) return;
+  clearTimeout(q.timer); q.timer = null; q.running = true;
+  var edits = q.fns.slice();
+  S.store.get(q.col, q.id).then(function(server){
+    editConflict = false;
+    var result = applyEdits(server ? server : null, edits);
+    if (editConflict) {
+      editConflict = false;
+      toast('The challenge\'s first day was just changed on another phone, so your last change wasn\'t saved. Please try it again.');
+      if (S.store.poke) { S.store.poke('meta'); S.store.poke('members'); }
+    }
+    if (result === undefined || (result === null && !server)) return {skip:true};
+    if (result) result.updatedAt = Date.now();
+    return (result === null ? S.store.remove(q.col, q.id) : S.store.put(q.col, q.id, result)).then(function(){ return {doc:result}; });
+  }).then(function(r){
+    q.fns.splice(0, edits.length); q.tries = 0; q.running = false; S.quota = false;
+    var k = q.col + '/' + q.id;
+    if (!r.skip) {
+      /* Show the stored result, with any edits made meanwhile on top. */
+      setLocal(q.col, q.id, q.fns.length ? applyEdits(r.doc ? clone(r.doc) : null, q.fns) : r.doc);
+      recent[k] = Date.now();
+    }
+    if (q.fns.length) kick(q); else pendingSet(k, undefined);
+    scheduleRender();
+  }, function(err){
+    q.running = false;
+    var code = err && err.code;
+    if (code === 'invalid_argument' || code === 'not_granted' || code === 'revoked') {
+      q.fns = []; pendingSet(q.col + '/' + q.id, undefined); S.readOnly = true; toast(RO_MSG); scheduleRender(); return;
+    }
+    if (code === 'quota_exceeded') { q.fns = []; pendingSet(q.col + '/' + q.id, undefined); toast('Storage is full. Remove some old plans or exercises and try again.'); scheduleRender(); return; }
+    if (code === 'rate_limited' || code === 'resource_exhausted') { quotaHit(); q.tries = Math.max(q.tries, 6); }
+    q.tries++;
+    if (q.tries === 1) scheduleRender();   /* the "not saved yet" banner appears */
+    q.timer = setTimeout(function(){ kick(q); }, Math.min(60000, 1500 * Math.pow(2, q.tries - 1)) + Math.random() * 500);
+  });
+}
+function kickAll(){ for (var k in queues) if (queues[k].fns.length && !queues[k].running) { queues[k].tries = Math.max(0, queues[k].tries - 1); kick(queues[k]); } }
+window.addEventListener('online', kickAll);
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) kickAll(); });
+/* Changes that were still waiting when the app was last closed: write them now (as they were shown then). */
+function resumePending(){
+  var p = pendingLoad();
+  Object.keys(p).forEach(function(k){
+    var i = k.indexOf('/'), col = k.slice(0, i), id = k.slice(i + 1), entry = p[k] || {}, doc = entry.d;
+    /* Skip anything older than a week: by then it's more likely to undo newer changes than to save a lost one. */
+    if (!S.data[col] || !entry.at || Date.now() - entry.at > 7 * DAY) { pendingSet(k, undefined); return; }
+    var q = queues[k] || (queues[k] = {col:col, id:id, fns:[], running:false, tries:0, timer:null});
+    q.fns.push({fn: function(){ return doc ? clone(doc) : null; }, ids:[]});
+    kick(q);
+  });
+}
 function ingest(col, docs){
   var next = {}, now = Date.now();
   docs.forEach(function(d){ next[d.id] = d.data; });
-  if (S.store && S.store.kind === 'firebase') {
-    var cur = S.data[col];
-    Object.keys(cur).forEach(function(id){
-      var k = col + '/' + id;
-      if (recent[k] && now - recent[k] < 60000) { var a = cur[id], b = next[id]; if (a && (!b || (a.updatedAt||0) > (b.updatedAt||0))) next[id] = a; }
-    });
-    Object.keys(recentDel).forEach(function(k){ var p = k.split('/'); if (p[0] === col && now - recentDel[k] < 60000) delete next[p[1]]; });
+  Object.keys(queues).forEach(function(k){
+    var q = queues[k]; if (q.col !== col) return;
+    if (q.fns.length) {
+      /* Waiting edits: rebuild on top of what was just fetched, so others' changes show too. */
+      var r = applyEdits(next[q.id] ? clone(next[q.id]) : null, q.fns);
+      if (r === null) delete next[q.id]; else if (r !== undefined) next[q.id] = r;
+    } else if (recent[k] && now - recent[k] < 60000) {
+      /* Just written: a poll that started before the write can still return the older version. */
+      var a = S.data[col][q.id], b = next[q.id];
+      if (a === undefined && b !== undefined && (b.updatedAt || 0) <= recent[k]) delete next[q.id];
+      else if (a && (!b || (a.updatedAt || 0) > (b.updatedAt || 0))) next[q.id] = a;
+    }
+  });
+  if (S.store && S.store.poke && settings()) {
+    var st0 = settings().startDate;
+    if (col === 'members' && Object.keys(next).some(function(id){ return next[id] && next[id].base && next[id].base !== st0; })) S.store.poke('meta');
+    if (col === 'meta' && next.settings && next.settings.startDate && next.settings.startDate !== st0) S.store.poke('members');
   }
   if (S.got[col] && JSON.stringify(next) === JSON.stringify(S.data[col])) return;
   S.data[col] = next; S.got[col] = true;
   scheduleRender();
   maybeAutoBackup();
 }
-function save(col, id, data){
-  if (S.readOnly) { toast(RO_MSG); return; }
-  data.updatedAt = Date.now();
-  S.data[col] = Object.assign({}, S.data[col]); S.data[col][id] = data;
-  recent[col + '/' + id] = Date.now(); delete recentDel[col + '/' + id];
-  enqueue(col, id, {data: clone(data)});
-  render();
-}
-function removeDoc(col, id){
-  if (S.readOnly) { toast(RO_MSG); return; }
-  S.data[col] = Object.assign({}, S.data[col]); delete S.data[col][id];
-  recentDel[col + '/' + id] = Date.now();
-  enqueue(col, id, {del:true});
-  render();
-}
-function enqueue(col, id, job){
-  var k = col + '/' + id, q = queues[k] || (queues[k] = {next:null, running:false});
-  q.next = job;
-  if (!q.running) drain(col, id, q);
-}
-function drain(col, id, q){
-  q.running = true;
-  (function step(){
-    if (!q.next) { q.running = false; return; }
-    var job = q.next; q.next = null; var tries = 0;
-    (function attempt(){
-      var p = job.del ? S.store.remove(col, id) : S.store.put(col, id, job.data);
-      p.then(step, function(e){
-        var code = e && e.code;
-        if (code === 'invalid_argument' || code === 'not_granted' || code === 'revoked') { S.readOnly = true; q.next = null; toast(RO_MSG); render(); q.running = false; return; }
-        if (code === 'quota_exceeded') { toast('Storage is full. Remove some old plans or exercises and try again.'); step(); return; }
-        if (++tries >= 3) { toast("Couldn't save. Check your connection, then try again."); step(); return; }
-        sleep(500 * tries + Math.random()*500).then(attempt);
-      });
-    })();
-  })();
-}
 function updateMe(fn){
   if (!S.me || !S.data.members[S.me]) return;
-  var m = clone(S.data.members[S.me]);
-  m.plan = m.plan || []; m.log = m.log || {};
-  while (m.plan.length < len()) m.plan.push({items:[]});
-  for (var i=0;i<m.plan.length;i++) if (!m.plan[i] || !m.plan[i].items) m.plan[i] = {items:[]};
-  fn(m);
-  save('members', S.me, m);
+  var L = len(), b0 = settings() ? settings().startDate : null;
+  mutate('members', S.me, function(m){
+    if (!m) return undefined;   /* removed by someone else meanwhile: nothing to update */
+    /* Day numbers in this edit count from b0. If the stored copy counts from a different first day
+       (it was just moved on another phone), applying it would land on the wrong dates: drop it and say so. */
+    if (b0 && m.base && m.base !== b0) { editConflict = true; return undefined; }
+    if (b0) m.base = b0;
+    m.plan = m.plan || []; m.log = m.log || {};
+    while (m.plan.length < L) m.plan.push({items:[]});
+    for (var i=0;i<m.plan.length;i++) if (!m.plan[i] || !m.plan[i].items) m.plan[i] = {items:[]};
+    fn(m);
+    return m;
+  });
 }
 
 /* ---------- backups ----------
@@ -701,7 +833,9 @@ function scheduleRender(){
 function flushDeferred(){ if (deferred && !editing() && !ptrDown) { deferred = false; render(); } }
 document.addEventListener('focusout', function(){ setTimeout(flushDeferred, 0); });
 document.addEventListener('pointerdown', function(){ ptrDown = true; }, true);
-function ptrEnd(){ setTimeout(function(){ ptrDown = false; flushDeferred(); }, 150); }
+var afterTapQ = [];
+function afterTap(fn){ if (ptrDown) afterTapQ.push(fn); else fn(); }
+function ptrEnd(){ setTimeout(function(){ ptrDown = false; var q = afterTapQ; afterTapQ = []; q.forEach(function(f){ f(); }); flushDeferred(); }, 150); }
 document.addEventListener('pointerup', ptrEnd, true);
 document.addEventListener('pointercancel', ptrEnd, true);
 var toastTimer = null;
@@ -710,9 +844,9 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(function(){ $toast.hidden = true; }, 3200);
 }
 function setView(v){
-  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null; S.pendingRestore = null;
+  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null; S.pendingRestore = null; S.pendingShift = null;
   if (v === 'group' && S.bk.status === 'ready') loadBackups();
-  try { history.replaceState(null, '', '#' + v); } catch(e){}
+  if (S.mode !== 'firebase') { try { history.replaceState(null, '', '#' + v); } catch(e){} }
   render(); window.scrollTo(0, 0);
 }
 
@@ -723,7 +857,7 @@ function render(){
   var kept = {};
   $app.querySelectorAll('[data-keep]').forEach(function(box){
     var k = box.getAttribute('data-keep');
-    box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){ kept[k + '|' + el.id] = el.type === 'checkbox' ? el.checked : el.value; });
+    box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){ if (el.dataset.dirty) kept[k + '|' + el.id] = el.type === 'checkbox' ? el.checked : el.value; });
   });
   renderTop(); renderNav();
   var html;
@@ -744,12 +878,19 @@ function render(){
     box.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){
       var v = kept[k + '|' + el.id]; if (v === undefined) return;
       if (el.type === 'checkbox') el.checked = v; else el.value = v;
+      el.dataset.dirty = '1';
     });
   });
   var nhw = $app.querySelector('.hm-wrap');
   if (nhw) {
-    if (hmScroll != null) nhw.scrollLeft = hmScroll;
-    else { var c = nhw.querySelector('.cell.today, .cell.sel'); if (c) nhw.scrollLeft = Math.max(0, c.offsetLeft - nhw.clientWidth/2); }
+    fitBoard();
+    if (hmScroll != null && !S.hmReset) nhw.scrollLeft = hmScroll;
+    else boardScrollTo(nhw, boardFirstDay(len()), 'left');
+    S.hmReset = false;
+    if (S.boardDay != null && S.boardDay !== S.shownBoardDay) boardScrollTo(nhw, S.boardDay);   /* bring a newly picked day into sight */
+    S.shownBoardDay = S.boardDay;
+    nhw.addEventListener('scroll', updateBoardArrows, {passive:true});
+    updateBoardArrows();
   }
   var strip = $app.querySelector('.strip');
   if (strip) {
@@ -795,6 +936,8 @@ function whoPicker(msg){
 function modeBanner(){
   if (S.mode === 'local') return '<div class="banner warn">Demo mode: changes are saved in this browser only. Add your Firebase details to share the board (see the setup guide).</div>';
   if (S.readOnly) return '<div class="banner warn">' + esc(RO_MSG) + '</div>';
+  var w = waiting();
+  if (w.stuck) return '<div class="banner warn" role="status">Not saved yet: ' + w.n + ' change' + (w.n === 1 ? '' : 's') + (S.quota ? ' waiting for the database\'s daily limit to reset.' : ' waiting for a connection.') + ' They save automatically, even if you close the app.</div>';
   return '';
 }
 function viewOffline(){
@@ -812,7 +955,7 @@ function shareCard(){
   var rk = 'leave';
   return '<section class="card" style="margin-top:14px"><div><h2 class="sm">Invite link</h2><p class="lead" style="margin-top:4px">Send this to the group. Anyone with it can open and edit the board, so keep it in your group chat.</p></div>' +
     '<div class="btnrow" style="flex-wrap:nowrap"><input type="text" id="share-link" readonly value="' + esc(shareLink()) + '" aria-label="Invite link" style="flex:1"><button class="btn" data-act="copylink">Copy</button></div>' +
-    '<div><button class="linkbtn" data-act="leavegroup" data-confirm="' + rk + '">' + (S.confirmKey === rk ? 'Tap again to forget this group on this device' : 'Forget this group on this device') + '</button></div></section>';
+    '<div><button class="linkbtn" data-act="leavegroup" data-confirm=\"' + esc(rk) + '\">' + (S.confirmKey === rk ? 'Tap again to forget this group on this device' : 'Forget this group on this device') + '</button></div></section>';
 }
 function viewSetup(){
   var st = settings() || {};
@@ -865,6 +1008,80 @@ function catchupBlock(m, today){
   return '<div class="catchup"><div class="lbl">' + (open.length ? 'Missed yesterday? Tap to catch up today' : 'Caught up on yesterday') + '</div><div class="chips">' +
     open.concat(caught).map(function(it){ return chip(m, it, y, true); }).join('') + '</div></div>';
 }
+/* Shortest unique prefix (at least 2 letters) per name, for the narrow board's name column: Merna/Mahmoud -> Me/Ma. */
+function shortNames(ms){
+  var out = {};
+  ms.forEach(function(m){
+    var n = String(m.name || '?').trim(), k = 2;
+    while (k < n.length && ms.some(function(o){ return o.id !== m.id && String(o.name || '').trim().slice(0, k).toLowerCase() === n.slice(0, k).toLowerCase(); })) k++;
+    out[m.id] = n.slice(0, k);
+  });
+  return out;
+}
+/* The board fits the screen width: one column per day, sized to the space available, with a small gap
+   between weeks. Up to 4 weeks per band; longer challenges stack bands. */
+/* The board: every day in one row, with columns sized so exactly BOARD_DAYS fit the screen (fitBoard);
+   the rest is reached by swiping. Names stay pinned on the left. */
+var BOARD_DAYS = 14;
+/* First visible day by default: days 1-14 until today reaches Day 11, then today stays in the 10th column. */
+function boardFirstDay(L){ var t = dayIdx(); return clamp(t - 9, 0, Math.max(0, L - BOARD_DAYS)); }
+function fitBoard(){
+  var wrap = $app.querySelector('.hm-wrap'), hm = wrap && wrap.querySelector('.hm'); if (!hm) return;
+  var name = hm.querySelector('.hm-name'), nw = name ? name.getBoundingClientRect().width : 40;
+  var colw = Math.max(12, (wrap.clientWidth - 10 - nw - 2 - (BOARD_DAYS - 1) * 2) / BOARD_DAYS);
+  hm.style.setProperty('--colw', colw.toFixed(2) + 'px');
+}
+function boardScrollTo(wrap, i, edge){
+  var h = wrap.querySelector('.hm-h[data-i="' + i + '"]'), name = wrap.querySelector('.hm-name'); if (!h || !name) return;
+  var hr = h.getBoundingClientRect(), nr = name.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+  if (edge === 'left' || hr.left < nr.right) wrap.scrollLeft += hr.left - nr.right - 2;
+  else if (hr.right > wr.right - 10) wrap.scrollLeft += hr.right - (wr.right - 10);
+}
+var lastW = window.innerWidth;
+window.addEventListener('resize', function(){ if (window.innerWidth === lastW) return; lastW = window.innerWidth; if (S.view === 'board') { S.hmReset = true; scheduleRender(); } });
+/* Small arrows at the board's edges when days are hidden on that side. */
+function updateBoardArrows(){
+  var wrap = $app.querySelector('.hm-wrap'), box = wrap && wrap.parentNode; if (!box) return;
+  var name = wrap.querySelector('.hm-name');
+  box.style.setProperty('--namew', (name ? name.getBoundingClientRect().width : 40) + 'px');
+  var max = wrap.scrollWidth - wrap.clientWidth;
+  box.querySelector('.hm-more.l').hidden = !(wrap.scrollLeft > 2);
+  box.querySelector('.hm-more.r').hidden = !(wrap.scrollLeft < max - 2);
+}
+function boardStep(dir){
+  var wrap = $app.querySelector('.hm-wrap'), hm = wrap && wrap.querySelector('.hm'); if (!hm) return;
+  var colw = parseFloat(hm.style.getPropertyValue('--colw')) || 20;
+  wrap.scrollBy({left: dir * 7 * (colw + 2), behavior: window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+}
+function boardGrid(ms, L, today, d){
+  var sn = shortNames(ms), html = '';
+  {
+    var start = 0, end = L, g = '<div class="hm" style="grid-template-columns:auto repeat(' + L + ',var(--colw,20px))">';
+    g += '<div class="hm-corner" style="grid-row:1;grid-column:1"></div>';
+    for (var i=start;i<end;i++){
+      g += '<div class="hm-h' + (i === today ? ' today' : i % 7 === 0 ? ' wk' : '') + '" data-i="' + i + '" style="grid-row:1;grid-column:' + (i+2) + '">' + (i+1) + '</div>';
+    }
+    ms.forEach(function(m, r){
+      g += '<div class="hm-name" style="--mc:' + mc(m) + ';grid-row:' + (r+2) + ';grid-column:1" title="' + esc(m.name) + '"><span class="avatar sm">' + esc(sn[m.id]) + '</span><span class="full">' + esc(m.name) + '</span></div>';
+      for (var i=start;i<end;i++){
+        var s = dayStat(m, i), cls = 'cell', p = 0, lab;
+        if (s.empty) { cls += ' none'; lab = 'no plan'; }
+        else if (s.rest) { cls += ' rest'; lab = 'rest day'; }
+        else if (i > today) { cls += ' future'; lab = 'upcoming'; }
+        else { p = Math.round(s.done / s.total * 100); if (!s.done && i < today) cls += ' missed'; cls += p === 100 ? ' full' : p ? ' part' : ''; lab = s.done + ' of ' + s.total + ' done'; if (p) p = 25 + Math.round(p * .75); }
+        if (s.late) { cls += ' late'; lab += ', ' + s.late + ' caught up the next day'; }
+        if (i === today) cls += ' today'; if (i === d && d !== today) cls += ' sel';
+        g += '<button class="' + cls + '" style="--mc:' + mc(m) + ';--p:' + p + '%;grid-row:' + (r+2) + ';grid-column:' + (i+2) + '" data-act="goday" data-d="' + i + '" aria-label="' + esc(m.name + ', day ' + (i+1) + ': ' + lab) + '"></button>';
+      }
+    });
+    html += g + '</div>';
+  }
+  return '<div class="sec-h tight"><h2>The board</h2><span>Swipe for more days · tap one to view it</span></div>' +
+    '<div class="hm-box"><div class="hm-wrap">' + html + '</div>' +
+    '<button class="hm-more l" data-act="hmstep" data-dir="-1" aria-label="Earlier days" hidden>' + IC.left + '</button>' +
+    '<button class="hm-more r" data-act="hmstep" data-dir="1" aria-label="Later days" hidden>' + IC.right + '</button></div>' +
+    '<div class="legend"><span><i class="cell" style="--p:100%"></i>All done</span><span><i class="cell" style="--p:55%"></i>Some done</span><span><i class="cell late" style="--p:100%"></i>Caught up</span><span><i class="cell missed"></i>Missed</span><span><i class="cell rest"></i>Rest</span><span><i class="cell future"></i>Upcoming</span></div>';
+}
 function viewBoard(){
   var st = settings(), ms = members();
   if (!st || !ms.length) return viewSetup();
@@ -892,10 +1109,12 @@ function viewBoard(){
     bar +
     '<div class="teamlabel"><span>Team: <b>' + dn + ' of ' + tot + '</b> exercises done</span><span><b>' + peopleDone + ' of ' + peopleWith + '</b> finished the day</span></div>' +
     '<div class="stats">' +
-      '<div class="stat"><b>' + streak(teamOk(ms)) + '</b><span>day team streak</span></div>' +
-      '<div class="stat"><b>' + (tf.total ? Math.round(tf.done / tf.total * 100) : 0) + '%</b><span>team done so far</span></div>' +
+      '<div class="stat"><b>' + streak(teamOk(ms)) + '</b><span>team streak</span></div>' +
+      '<div class="stat"><b>' + (tf.total ? Math.round(tf.done / tf.total * 100) : 0) + '%</b><span>team done</span></div>' +
       '<div class="stat"><b>' + Math.max(0, L - Math.max(today, 0) - (today >= 0 ? 1 : 0)) + '</b><span>days left</span></div>' +
     '</div></section>';
+
+  out += boardGrid(ms, L, today, d);
 
   var order = stats.slice().sort(function(a,b){ return (b.m.id === S.me) - (a.m.id === S.me); });
   var hint = !m0 ? '' : d === today ? 'Tap your exercises to log them' : d === today - 1 ? 'Tap to catch up on what you missed' : d > today ? 'Upcoming' : 'Past days are locked';
@@ -909,25 +1128,6 @@ function viewBoard(){
       return '<article class="mcard' + (mine ? ' me' : '') + '" style="--mc:' + mc(m) + '"><div class="mhead"><span class="avatar">' + initial(m) + '</span><span class="mname">' + esc(m.name) + (mine ? ' <small>(you)</small>' : '') + '</span><span class="mscore' + (s.complete ? ' full' : '') + '">' + score + '</span></div>' + body + '</article>';
     }).join('') + '</div>';
 
-  var head = '<div class="hm-corner"></div>';
-  for (var i=0;i<L;i++) head += '<div class="hm-h' + (i === today ? ' today' : i % 7 === 0 ? ' wk' : '') + '">' + (i+1) + '</div>';
-  var rows = ms.map(function(m){
-    var r = '<div class="hm-name" style="--mc:' + mc(m) + '"><span class="avatar sm">' + initial(m) + '</span>' + esc(m.name) + '</div>';
-    for (var i=0;i<L;i++){
-      var s = dayStat(m, i), cls = 'cell', p = 0, lab;
-      if (s.empty) { cls += ' none'; lab = 'no plan'; }
-      else if (s.rest) { cls += ' rest'; lab = 'rest day'; }
-      else if (i > today) { cls += ' future'; lab = 'upcoming'; }
-      else { p = Math.round(s.done / s.total * 100); if (!s.done && i < today) cls += ' missed'; lab = s.done + ' of ' + s.total + ' done'; if (p) p = 25 + Math.round(p * .75); }
-      if (s.late) { cls += ' late'; lab += ', ' + s.late + ' caught up the next day'; }
-      if (i === today) cls += ' today'; if (i === d && d !== today) cls += ' sel';
-      r += '<button class="' + cls + '" style="--mc:' + mc(m) + ';--p:' + p + '%" data-act="goday" data-d="' + i + '" aria-label="' + esc(m.name + ', day ' + (i+1) + ': ' + lab) + '"></button>';
-    }
-    return r;
-  }).join('');
-  out += '<div class="sec-h"><h2>The board</h2><span>Tap a square to see that day</span></div>' +
-    '<div class="hm-wrap"><div class="hm" style="grid-template-columns:auto repeat(' + L + ',24px)">' + head + rows + '</div></div>' +
-    '<div class="legend"><span><i class="cell" style="--p:100%"></i>All done</span><span><i class="cell" style="--p:55%"></i>Some done</span><span><i class="cell late" style="--p:100%"></i>Caught up next day</span><span><i class="cell missed"></i>Missed</span><span><i class="cell rest"></i>Rest</span><span><i class="cell future"></i>Upcoming</span></div>';
 
   var st2 = ms.map(function(m){ return {m:m, f:soFar(m), k:streak(memberOk(m))}; }).sort(function(a,b){ return (b.f.pct - a.f.pct) || (b.k - a.k) || (b.f.done - a.f.done); });
   out += '<div class="sec-h"><h2>Standings</h2><span>Exercises done so far</span></div><div class="panel">' + st2.map(function(x, k){
@@ -937,7 +1137,7 @@ function viewBoard(){
 }
 
 /* ---------- my plan ---------- */
-function planDayIdx(){ return clamp(S.planDay != null ? S.planDay : dayIdx(), 0, len()-1); }
+function planDayIdx(el){ if (el && el.dataset && el.dataset.d != null && el.dataset.d !== '') return +el.dataset.d; return clamp(S.planDay != null ? S.planDay : dayIdx(), 0, len()-1); }
 function viewPlan(){
   var m = me();
   if (!settings()) return viewSetup();
@@ -953,30 +1153,32 @@ function viewPlan(){
   }
   out += '</div>';
   var tag = d === today ? '<span class="tag now">Today</span>' : d === today - 1 ? '<span class="tag">Yesterday · catch-up</span>' : d < today ? '<span class="tag">Past · locked</span>' : '<span class="tag">Upcoming</span>';
-  var exs = exList();
+  var exs = exList(), editable = canEditPlan(d);
   out += '<section class="card" style="margin-top:8px"><div class="dayhead"><h2>Day ' + (d+1) + ' <span class="hint" style="font-family:var(--f-body);font-size:.95rem;font-weight:600">' + esc(fmt(d, {weekday:'long', day:'numeric', month:'short'})) + '</span></h2>' + tag + '</div>';
   out += '<div class="items">' + (s.items.length ? s.items.map(function(it){
     var e = ex(it.ex), n = e && e.levels ? e.levels.length : 0, lg = s.log[it.id], st = lg && lg.s, rest = isRest(it);
     var rk = 'rm-' + d + '-' + it.id, ctl = '';
     if (!rest && canLog(d)) {
       var doneLabel = d === today ? 'Done' : 'Caught up';
-      ctl = '<div class="seg" role="group" aria-label="Log it"><button data-act="mark" data-item="' + esc(it.id) + '" data-s="done" class="' + (st === 'done' ? 'on' : '') + '" aria-pressed="' + (st === 'done') + '">' + (st === 'done' && d === today - 1 && !lg.c ? 'Done' : doneLabel) + '</button><button data-act="mark" data-item="' + esc(it.id) + '" data-s="skip" class="' + (st === 'skip' ? 'on' : '') + '" aria-pressed="' + (st === 'skip') + '">Skipped</button></div>';
+      ctl = '<div class="seg" role="group" aria-label="Log it"><button data-act="mark" data-d="' + d + '" data-item="' + esc(it.id) + '" data-s="done" class="' + (st === 'done' ? 'on' : '') + '" aria-pressed="' + (st === 'done') + '">' + (st === 'done' && d === today - 1 && !lg.c ? 'Done' : doneLabel) + '</button><button data-act="mark" data-d="' + d + '" data-item="' + esc(it.id) + '" data-s="skip" class="' + (st === 'skip' ? 'on' : '') + '" aria-pressed="' + (st === 'skip') + '">Skipped</button></div>';
     } else if (!rest && d < today) {
       ctl = st === 'done' ? '<span class="state done">' + (lg.c ? 'Caught up' : 'Done') + '</span>' : st === 'skip' ? '<span class="state skip">Skipped</span>' : '<span class="state missed">Missed</span>';
     }
-    return '<div class="item"><div class="item-top' + (n > 1 ? '' : ' nolvl') + '">' +
-      '<select aria-label="Exercise" data-chg="setex" data-item="' + esc(it.id) + '" id="ex-' + esc(it.id) + '">' + exOptions(it.ex) + '</select>' +
-      lvlSelect(it.ex, it.level, 'data-chg="setlvl" data-item="' + esc(it.id) + '" id="lv-' + esc(it.id) + '"') +
-      '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmitem" data-item="' + esc(it.id) + '" data-confirm="' + rk + '" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove' : 'Remove') + '" title="Remove">' + IC.trash + '</button></div>' +
+    var dis = editable ? '' : ' disabled';
+    return '<div class="item"><div class="item-top' + (n > 1 ? '' : ' nolvl') + (editable ? '' : ' locked') + '">' +
+      '<select aria-label="Exercise" data-chg="setex" data-d="' + d + '" data-item="' + esc(it.id) + '" id="ex-' + esc(it.id) + '"' + dis + '>' + exOptions(it.ex) + '</select>' +
+      lvlSelect(it.ex, it.level, 'data-chg="setlvl" data-d="' + d + '" data-item="' + esc(it.id) + '" id="lv-' + esc(it.id) + '"' + dis) +
+      (editable ? '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmitem" data-d="' + d + '" data-item="' + esc(it.id) + '" data-confirm="' + esc(rk) + '" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove' : 'Remove') + '" title="Remove">' + IC.trash + '</button>' : '') + '</div>' +
       '<div class="item-foot"><span class="item-desc"><span>' + esc(lvlText(it) || '') + '</span>' + refHtml(e) + '</span>' + ctl + '</div></div>';
   }).join('') : '<p class="empty-line">Nothing planned for this day yet.</p>') + '</div>';
-  out += '<div class="btnrow"><button class="btn primary" data-act="additem"' + (exs.length ? '' : ' disabled') + '>Add exercise</button>' +
-    (s.items.length ? '<button class="btn" data-act="repeat">Repeat weekly</button><button class="btn danger' + (S.confirmKey === 'clear' ? ' armed' : '') + '" data-act="clearday" data-confirm="clear">' + (S.confirmKey === 'clear' ? 'Tap again to clear' : 'Clear day') + '</button>' : '') + '</div>' +
+  out += '<div class="btnrow">' + (editable ? '<button class="btn primary" data-act="additem" data-d="' + d + '"' + (exs.length ? '' : ' disabled') + '>Add exercise</button>' : '') +
+    (s.items.length ? '<button class="btn" data-act="repeat" data-d="' + d + '">Repeat weekly</button>' + (editable ? '<button class="btn danger' + (S.confirmKey === 'clear' ? ' armed' : '') + '" data-act="clearday" data-d="' + d + '" data-confirm="clear">' + (S.confirmKey === 'clear' ? 'Tap again to clear' : 'Clear day') + '</button>' : '') : '') + '</div>' +
+    (editable ? '' : '<p class="hint">Past days keep the plan they were scored on, so they can\'t be changed.' + (canLog(d) ? ' You can still catch up on what you missed.' : '') + '</p>') +
     (s.items.length ? '<p class="hint">Repeat weekly copies this day to the same weekday in later weeks you haven\'t logged yet.</p>' : '') + '</section>';
   var others = members().filter(function(x){ return x.id !== m.id; });
   if (others.length) {
     out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">Copy a friend\'s plan</h2><p class="lead" style="margin-top:4px">Replaces your days from today on that you haven\'t logged yet. Your past days stay as they are.</p></div>' +
-      '<div class="btnrow" style="flex-wrap:nowrap"><select id="copyFrom" aria-label="Friend to copy from" style="flex:1">' + others.map(function(o){ return '<option value="' + esc(o.id) + '">' + esc(o.name) + '</option>'; }).join('') + '</select>' +
+      '<div class="btnrow" style="flex-wrap:nowrap"><select id="copyFrom" data-chg="copysel" aria-label="Friend to copy from" style="flex:1">' + others.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === S.copyFrom ? ' selected' : '') + '>' + esc(o.name) + '</option>'; }).join('') + '</select>' +
       '<button class="btn' + (S.confirmKey === 'copy' ? ' armed' : '') + '" data-act="copyfrom" data-confirm="copy">' + (S.confirmKey === 'copy' ? 'Tap to confirm' : 'Copy') + '</button></div></section>';
   }
   return out;
@@ -1052,7 +1254,7 @@ function planCard(p){
     out += '<div class="btnrow"><button class="btn primary sm" data-act="useplan" data-id="' + esc(p.id) + '"' + (me() ? '' : ' disabled') + '>Use this plan</button>' +
       (p.starter ? '' : '<button class="btn sm" data-act="editplan" data-id="' + esc(p.id) + '">Edit</button>') +
       '<button class="btn sm" data-act="dupplan" data-id="' + esc(p.id) + '">Duplicate</button>' +
-      (p.starter ? '' : '<button class="btn sm danger' + (S.confirmKey === dk ? ' armed' : '') + '" data-act="delplan" data-id="' + esc(p.id) + '" data-confirm="' + dk + '">' + (S.confirmKey === dk ? 'Tap again to delete' : 'Delete') + '</button>') + '</div>';
+      (p.starter ? '' : '<button class="btn sm danger' + (S.confirmKey === dk ? ' armed' : '') + '" data-act="delplan" data-id="' + esc(p.id) + '" data-confirm=\"' + esc(dk) + '\">' + (S.confirmKey === dk ? 'Tap again to delete' : 'Delete') + '</button>') + '</div>';
   } else {
     var L = len(), pv = applyPreview(p, a), opts = '';
     for (var j=Math.max(dayIdx(),0); j<L; j++) opts += '<option value="' + j + '"' + (j === a.start ? ' selected' : '') + '>Day ' + (j+1) + ' · ' + esc(fmt(j, {weekday:'short', day:'numeric', month:'short'})) + '</option>';
@@ -1103,10 +1305,11 @@ function viewPlans(){
   if (S.draft) out += draftEditor();
   else {
     var ms = members(), weeks = Math.ceil(len() / 7), wopts = '';
-    for (var w=0; w<weeks; w++) wopts += '<option value="' + w + '"' + (w === Math.floor(Math.max(dayIdx(),0) / 7) ? ' selected' : '') + '>Week ' + (w+1) + '</option>';
+    var wsel = S.impWeek != null && S.impWeek < weeks ? S.impWeek : Math.floor(clamp(dayIdx(), 0, len()-1) / 7);
+    for (var w=0; w<weeks; w++) wopts += '<option value="' + w + '"' + (w === wsel ? ' selected' : '') + '>Week ' + (w+1) + '</option>';
     out += '<section class="card" style="margin-top:14px"><div class="btnrow"><button class="btn primary" data-act="newplan">Create a plan</button></div>' +
-      '<div class="field"><span class="lbl">Or start from someone\'s week</span><div class="grid2"><select id="imp-who" aria-label="Person">' + ms.map(function(m){ return '<option value="' + esc(m.id) + '"' + (m.id === S.me ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('') + '</select>' +
-      '<select id="imp-week" aria-label="Week">' + wopts + '</select></div><div><button class="btn sm" data-act="importweek">Use as a starting point</button></div></div></section>';
+      '<div class="field"><span class="lbl">Or start from someone\'s week</span><div class="grid2"><select id="imp-who" data-chg="impwho" aria-label="Person">' + ms.map(function(m){ return '<option value="' + esc(m.id) + '"' + (m.id === (S.impWho || S.me) ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('') + '</select>' +
+      '<select id="imp-week" data-chg="impweek" aria-label="Week">' + wopts + '</select></div><div><button class="btn sm" data-act="importweek">Use as a starting point</button></div></div></section>';
   }
   var shared = sharedPlans();
   out += '<div class="sec-h"><h2>Shared by the group</h2><span>' + shared.length + '</span></div>' +
@@ -1121,12 +1324,12 @@ function exForm(e, id){
   var dk = 'delex-' + id;
   return '<form class="card" data-form="ex" data-id="' + esc(id || '') + '" data-keep="ex-' + esc(id || 'new') + '">' +
     '<div class="grid2"><div class="field"><label for="exf-name">Name</label><input id="exf-name" name="name" type="text" value="' + esc(e.name || '') + '" required></div>' +
-    '<div class="field"><label for="exf-kind">Type</label><select id="exf-kind" name="kind">' + KINDS.map(function(k){ return '<option value="' + k + '"' + ((e.kind || 'bodyweight') === k ? ' selected' : '') + '>' + (k === 'stretch' ? 'Stretch' : KIND_LABEL[k]) + '</option>'; }).join('') + '</select></div></div>' +
+    '<div class="field"><label for="exf-kind">Type</label><select id="exf-kind" name="kind"' + (id === 'rest' ? ' disabled' : '') + '>' + KINDS.map(function(k){ return '<option value="' + k + '"' + ((e.kind || 'bodyweight') === k ? ' selected' : '') + '>' + (k === 'stretch' ? 'Stretch' : KIND_LABEL[k]) + '</option>'; }).join('') + '</select></div></div>' +
     '<div class="field"><label for="exf-muscles">Muscles worked</label><input id="exf-muscles" name="muscles" type="text" value="' + esc(e.muscles || '') + '" placeholder="e.g. Chest, triceps"></div>' +
-    '<div class="field"><label for="exf-url">Form link</label><input id="exf-url" name="url" type="url" value="' + esc(e.url || (e.ref ? 'https://www.strengthlog.com/' + e.ref + '/' : '')) + '" placeholder="Leave empty to link a video search"></div>' +
+    '<div class="field"><label for="exf-url">Form link</label><input id="exf-url" name="url" type="text" inputmode="url" autocapitalize="off" spellcheck="false" value="' + esc(e.url || (e.ref ? 'https://www.strengthlog.com/' + e.ref + '/' : '')) + '" placeholder="Leave empty to link a video search"></div>' +
     '<div class="field"><label for="exf-levels">Levels, one per line (Level 1 first)</label><textarea id="exf-levels" name="levels" placeholder="2 Sets of 10&#10;2 Sets of 20&#10;2 Sets of 30">' + esc(levels) + '</textarea></div>' +
     '<div class="btnrow"><button class="btn primary" type="submit">Save</button><button class="btn" type="button" data-act="cancelex">Cancel</button>' +
-    (id ? '<button class="btn danger' + (S.confirmKey === dk ? ' armed' : '') + '" type="button" data-act="delex" data-id="' + esc(id) + '" data-confirm="' + dk + '">' + (S.confirmKey === dk ? 'Tap again to delete' : 'Delete') + '</button>' : '') + '</div></form>';
+    (id && id !== 'rest' ? '<button class="btn danger' + (S.confirmKey === dk ? ' armed' : '') + '" type="button" data-act="delex" data-id="' + esc(id) + '" data-confirm=\"' + esc(dk) + '\">' + (S.confirmKey === dk ? 'Tap again to delete' : 'Delete') + '</button>' : '') + '</div></form>';
 }
 function viewExercises(){
   var out = modeBanner() + '<h1 class="page-h">Exercises</h1><p class="lead">Shared by everyone. Change a level here and it updates in every plan that uses it.</p>';
@@ -1190,7 +1393,7 @@ function backupCard(){
   var canDownload = S.mode !== 'claude';
   out += '<div class="btnrow"><button class="btn sm" data-act="backupnow"' + (b.status === 'blocked' || S.readOnly ? ' disabled' : '') + '>Back up now</button>' +
     (canDownload ? '<button class="btn sm" data-act="downloadbk">Download a copy</button>' : '') +
-    '<label class="btn sm" for="bk-file">Restore from a file</label><input type="file" id="bk-file" accept=".json,application/json" data-chg="restorefile" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></div>' +
+    '<label class="btn sm" for="bk-file">Restore from a file</label></div>' +
     (canDownload ? '<p class="hint">Backups live in the same database as the board. They undo mistakes made in the app; a downloaded copy also covers losing the database itself.</p>' : '') + '</section>';
   return out;
 }
@@ -1232,7 +1435,7 @@ function viewGroup(){
     }
     return '<div><div class="mrow" style="--mc:' + mc(m) + '"><button class="swatch" data-act="color" data-id="' + esc(m.id) + '" aria-expanded="' + (S.colorFor === m.id) + '" aria-label="Change ' + esc(m.name) + '\'s color"></button>' +
       '<input type="text" id="mn-' + esc(m.id) + '" aria-label="Name" value="' + esc(m.name) + '" data-chg="rename" data-id="' + esc(m.id) + '">' +
-      '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmmember" data-id="' + esc(m.id) + '" data-confirm="' + rk + '" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove ' : 'Remove ') + esc(m.name) + '" title="Remove">' + IC.trash + '</button></div>' + pal + '</div>';
+      '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmmember" data-id="' + esc(m.id) + '" data-confirm=\"' + esc(rk) + '\" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove ' : 'Remove ') + esc(m.name) + '" title="Remove">' + IC.trash + '</button></div>' + pal + '</div>';
   }).join('') +
     '<form data-form="addmember" class="btnrow" style="flex-wrap:nowrap"><input type="text" id="g-newname" name="name" placeholder="Add a person" aria-label="New person\'s name" required style="flex:1"><button class="btn" type="submit">Add</button></form></section>';
   out += shareCard();
@@ -1263,33 +1466,37 @@ var A = {
   logout: function(){ S.me = null; LS.set('fw.me', null); render(); },
   day: function(b){ S.boardDay = clamp(+b.dataset.d, 0, len()-1); render(); },
   today: function(){ S.boardDay = null; render(); },
-  goday: function(b){ S.boardDay = +b.dataset.d; render(); window.scrollTo({top:0, behavior:'smooth'}); },
+  goday: function(b){ S.boardDay = +b.dataset.d; render(); },
+  hmstep: function(b){ boardStep(+b.dataset.dir); },
   planday: function(b){ S.planDay = +b.dataset.d; setView('plan'); },
   pday: function(b){ S.planDay = +b.dataset.d; render(); },
   toggle: function(b){
     var d = +b.dataset.d, iid = b.dataset.item, late = d === dayIdx() - 1;
     if (!canLog(d)) return;
-    updateMe(function(m){
-      var e = m.log[d] && m.log[d][iid], cur = e && e.s;
-      if (cur === 'done') setLog(m, d, iid, 'skip'); else if (cur === 'skip') setLog(m, d, iid, null); else setLog(m, d, iid, 'done', late);
-    });
+    /* The new state comes from what was on screen when tapped, so a newer copy elsewhere can't flip it the other way. */
+    var mine = S.data.members[S.me] || {}, e0 = mine.log && mine.log[d] && mine.log[d][iid], cur = e0 && e0.s;
+    var target = cur === 'done' ? 'skip' : cur === 'skip' ? null : 'done';
+    updateMe(function(m){ setLog(m, d, iid, target, target === 'done' && late); });
   },
   mark: function(b){
-    var d = planDayIdx(), iid = b.dataset.item, s = b.dataset.s;
+    var d = planDayIdx(b), iid = b.dataset.item, s = b.dataset.s;
     if (!canLog(d)) return;
-    updateMe(function(m){ var e = m.log[d] && m.log[d][iid], cur = e && e.s; setLog(m, d, iid, cur === s ? null : s, s === 'done' && d === dayIdx() - 1); });
+    var mine = S.data.members[S.me] || {}, e0 = mine.log && mine.log[d] && mine.log[d][iid], target = (e0 && e0.s) === s ? null : s;
+    updateMe(function(m){ setLog(m, d, iid, target, target === 'done' && d === dayIdx() - 1); });
   },
-  additem: function(){
-    var d = planDayIdx(), first = firstWorkEx(); if (!first) return;
+  additem: function(b){
+    var d = planDayIdx(b), first = firstWorkEx(); if (!first) return;
+    if (!canEditPlan(d)) return;
     updateMe(function(m){ m.plan[d].items.push({id:uid('i'), ex:first, level:1}); });
   },
   rmitem: function(b){
-    var d = planDayIdx(), iid = b.dataset.item;
+    var d = planDayIdx(b), iid = b.dataset.item;
+    if (!canEditPlan(d)) return;
     updateMe(function(m){ m.plan[d].items = m.plan[d].items.filter(function(x){ return x.id !== iid; }); if (m.log[d]) { delete m.log[d][iid]; if (!Object.keys(m.log[d]).length) delete m.log[d]; } });
   },
-  clearday: function(){ var d = planDayIdx(); updateMe(function(m){ m.plan[d] = {items:[]}; delete m.log[d]; }); },
-  repeat: function(){
-    var d = planDayIdx(), n = 0;
+  clearday: function(b){ var d = planDayIdx(b); if (!canEditPlan(d)) return; updateMe(function(m){ m.plan[d] = {items:[]}; delete m.log[d]; }); },
+  repeat: function(b){
+    var d = planDayIdx(b), n = 0;
     updateMe(function(m){
       var src = m.plan[d].items;
       for (var j = d + 7; j < len(); j += 7) {
@@ -1300,7 +1507,7 @@ var A = {
     toast(n ? 'Copied to ' + n + ' later ' + (n === 1 ? 'day' : 'days') : 'No later days to copy to');
   },
   copyfrom: function(){
-    var sel = document.getElementById('copyFrom'); var src = sel && S.data.members[sel.value]; if (!src) return;
+    var sel = document.getElementById('copyFrom'), srcId = S.copyFrom && S.data.members[S.copyFrom] && S.copyFrom !== S.me ? S.copyFrom : (sel && sel.value), src = S.data.members[srcId]; if (!src) return;
     var from = Math.max(dayIdx(), 0), n = 0;
     updateMe(function(m){
       for (var j = from; j < len(); j++) {
@@ -1364,26 +1571,31 @@ var A = {
   newex: function(){ S.editEx = '__new'; render(); var f = document.getElementById('exf-name'); if (f) f.focus(); },
   editex: function(b){ S.editEx = b.dataset.id; S.confirmKey = null; render(); },
   cancelex: function(){ S.editEx = null; render(); },
-  delex: function(b){ var id = b.dataset.id; S.editEx = null; if (CATALOG[id]) save('exercises', id, {deleted:true}); else removeDoc('exercises', id); toast('Exercise deleted'); },
+  delex: function(b){ var id = b.dataset.id; if (id === 'rest') return; S.editEx = null; if (CATALOG[id]) save('exercises', id, {deleted:true}); else removeDoc('exercises', id); toast('Exercise deleted'); },
   /* group */
   color: function(b){ S.colorFor = S.colorFor === b.dataset.id ? null : b.dataset.id; render(); },
-  setcolor: function(b){ var m = clone(S.data.members[b.dataset.id]); m.color = +b.dataset.c; S.colorFor = null; save('members', b.dataset.id, m); },
+  setcolor: function(b){ S.colorFor = null; patch('members', b.dataset.id, {color: +b.dataset.c}); },
   rmmember: function(b){ var id = b.dataset.id; if (S.me === id) { S.me = null; LS.set('fw.me', null); } removeDoc('members', id); },
   confirmshift: function(){
     var ps = S.pendingShift; if (!ps) return;
-    var d = ps.delta;
+    var oldStart = settings().startDate, d = Math.round((parseD(ps.start) - parseD(oldStart)) / DAY);
+    if (!d) { if (ps.fields && Object.keys(ps.fields).length) patch('meta', 'settings', ps.fields); S.pendingShift = null; render(); return; }
     /* Every plan day and check-in keeps its calendar date: index i becomes i - d.
        Moving later drops days before the new first day; moving earlier adds empty days in front. */
     members().forEach(function(x){
-      var m = clone(S.data.members[x.id]), plan = m.plan || [], log = m.log || {}, nl = {};
-      if (d > 0) plan = plan.slice(d);
-      else { var pre = []; for (var i=0;i<-d;i++) pre.push({items:[]}); plan = pre.concat(plan); }
-      Object.keys(log).forEach(function(k){ var j = +k - d; if (j >= 0) nl[j] = log[k]; });
-      m.plan = plan; m.log = nl;
-      save('members', x.id, m);
+      mutate('members', x.id, function(m){
+        if (!m) return undefined;
+        /* Shift by the distance from the first day this copy actually counts from (safe to repeat). */
+        var dd = Math.round((parseD(ps.start) - parseD(m.base || oldStart)) / DAY);
+        var plan = m.plan || [], log = m.log || {}, nl = {};
+        if (dd > 0) plan = plan.slice(dd);
+        else if (dd < 0) { var pre = []; for (var i=0;i<-dd;i++) pre.push({items:[]}); plan = pre.concat(plan); }
+        Object.keys(log).forEach(function(k){ var j = +k - dd; if (j >= 0) nl[j] = log[k]; });
+        m.plan = plan; m.log = nl; m.base = ps.start;
+        return m;
+      });
     });
-    var st = clone(settings()); st.title = ps.title; st.length = ps.length; st.startDate = ps.start;
-    save('meta', 'settings', st);
+    patch('meta', 'settings', Object.assign({}, ps.fields || {}, {startDate: ps.start}));
     S.pendingShift = null; S.boardDay = null; S.planDay = null;
     toast('First day moved. Everyone\'s plans stay on the same dates.');
   },
@@ -1427,15 +1639,21 @@ var A = {
 };
 var C = {
   setex: function(el){
-    var d = planDayIdx();
+    var d = planDayIdx(el); if (!canEditPlan(d)) return;
     updateMe(function(m){ var it = findItem(m, d, el.dataset.item); if (!it) return; it.ex = el.value; it.level = capLevel(el.value, it.level); });
   },
-  setlvl: function(el){ var d = planDayIdx(); updateMe(function(m){ var it = findItem(m, d, el.dataset.item); if (it) it.level = +el.value; }); },
+  setlvl: function(el){ var d = planDayIdx(el); if (!canEditPlan(d)) return; updateMe(function(m){ var it = findItem(m, d, el.dataset.item); if (it) it.level = +el.value; }); },
   rename: function(el){
     var v = el.value.trim(); var m = S.data.members[el.dataset.id]; if (!m || !v || v === m.name) { if (m) el.value = m.name; return; }
-    var c = clone(m); c.name = v; save('members', el.dataset.id, c);
+    var id = el.dataset.id;
+    /* Renaming saves when the field loses focus, which is usually the start of a tap on something else:
+       wait for that tap to finish so the redraw doesn't swallow it. */
+    afterTap(function(){ patch('members', id, {name: v}); });
   },
   apstart: function(el){ if (S.applying) { S.applying.start = +el.value; render(); } },
+  copysel: function(el){ S.copyFrom = el.value; },
+  impwho: function(el){ S.impWho = el.value; },
+  impweek: function(el){ S.impWeek = +el.value; },
   restorefile: function(el){
     var f = el.files && el.files[0]; if (!f) return;
     var r = new FileReader();
@@ -1470,32 +1688,37 @@ var F = {
     var names = f.names.value.split(/\n|,/).map(function(s){ return s.trim(); }).filter(Boolean);
     save('meta', 'settings', {title: f.title.value.trim() || 'Friends Workout', startDate: f.start.value, length: clamp(parseInt(f.length.value,10) || 28, 1, 366)});
     var taken = Object.assign({}, S.data.members), base = members().length;
-    names.forEach(function(n, k){ var id = uniqueId(n, taken, 'm'); taken[id] = 1; save('members', id, {name:n, color:(base + k) % NCOL, order:base + k, plan:[], log:{}}); });
+    names.forEach(function(n, k){ var id = uniqueId(n, taken, 'm'); taken[id] = 1; save('members', id, {name:n, color:(base + k) % NCOL, order:base + k, plan:[], log:{}, base:f.start.value}); });
     toast('Board created');
   },
   settings: function(f){
-    var st = clone(settings()); st.title = f.title.value.trim() || st.title; st.length = clamp(parseInt(f.length.value,10) || len(), 1, 366);
-    var newStart = f.start.value || st.startDate, delta = Math.round((parseD(newStart) - parseD(st.startDate)) / DAY);
+    /* Save only what was changed in this form, so someone else's newer change to another field isn't undone. */
+    var st = settings(), fields = {};
+    if (f.title.value !== f.title.defaultValue && f.title.value.trim()) fields.title = f.title.value.trim();
+    if (f.length.value !== f.length.defaultValue && parseInt(f.length.value, 10)) fields.length = clamp(parseInt(f.length.value, 10), 1, 366);
+    var newStart = f.start.value && f.start.value !== f.start.defaultValue ? f.start.value : st.startDate;
+    var delta = Math.round((parseD(newStart) - parseD(st.startDate)) / DAY);
     if (delta) {
       /* Moving the first day re-numbers every day. Confirm first, showing what falls off the front. */
       var dropped = 0;
       if (delta > 0) members().forEach(function(m){ Object.keys(m.log || {}).forEach(function(k){ if (+k < delta) dropped += Object.keys(m.log[k]).length; }); });
-      S.pendingShift = {title: st.title, length: st.length, start: newStart, delta: delta, dropped: dropped};
+      S.pendingShift = {fields: fields, title: fields.title || st.title, length: fields.length || len(), start: newStart, delta: delta, dropped: dropped};
       render(); return;
     }
-    save('meta', 'settings', st); toast('Challenge saved');
+    if (Object.keys(fields).length) patch('meta', 'settings', fields);
+    S.noKeep = 'settings'; render(); toast(Object.keys(fields).length ? 'Challenge saved' : 'Nothing changed');
   },
   addmember: function(f){
     var n = f.name.value.trim(); if (!n) return;
     var id = uniqueId(n, S.data.members, 'm'), used = members().map(function(m){ return (m.color || 0) % NCOL; }), c = 0;
     while (used.indexOf(c) >= 0 && c < NCOL - 1) c++;
     var maxOrder = members().reduce(function(a, m){ return Math.max(a, m.order || 0); }, -1);
-    save('members', id, {name:n, color:c, order:maxOrder + 1, plan:[], log:{}});
+    save('members', id, {name:n, color:c, order:maxOrder + 1, plan:[], log:{}, base:settings().startDate});
     toast(n + ' added');
   },
   ex: function(f){
     var id = f.dataset.id, name = f.name.value.trim(); if (!name) return;
-    var kind = f.kind.value, levels = kind === 'rest' ? [] : f.levels.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    var kind = id === 'rest' ? 'rest' : f.kind.value, levels = kind === 'rest' ? [] : f.levels.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
     var prev = id ? clone(ex(id)) : {};
     if (!id) { id = uniqueId(name, exMap(), 'e'); prev.order = 1000 + Object.keys(S.data.exercises).length; }
     prev.name = name; prev.kind = kind; prev.levels = levels; prev.muscles = f.muscles.value.trim();
@@ -1504,32 +1727,39 @@ var F = {
     S.editEx = null; save('exercises', id, prev); toast('Saved ' + name);
   }
 };
+var confirmTimer = null;
 document.addEventListener('click', function(e){
   var b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   if (b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
   var key = b.dataset.confirm;
   if (key && S.confirmKey !== key) {
     S.confirmKey = key; render();
-    setTimeout(function(){ if (S.confirmKey === key) { S.confirmKey = null; render(); } }, 4000);
+    clearTimeout(confirmTimer);
+    confirmTimer = setTimeout(function(){ if (S.confirmKey === key) { S.confirmKey = null; scheduleRender(); } }, 4000);
     return;
   }
+  clearTimeout(confirmTimer);
   S.confirmKey = null;
   var fn = A[b.dataset.act]; if (fn) { e.preventDefault(); fn(b, e); }
 });
 document.addEventListener('change', function(e){ var el = e.target.closest('[data-chg]'); if (el && C[el.dataset.chg]) C[el.dataset.chg](el); });
-document.addEventListener('input', function(e){ if (e.target.id === 'ex-search') { S.exQuery = e.target.value; applyExFilter(); } });
+function markDirty(e){ if (e.target && e.target.closest && e.target.closest('[data-keep]')) e.target.dataset.dirty = '1'; }
+document.addEventListener('input', function(e){ markDirty(e); if (e.target.id === 'ex-search') { S.exQuery = e.target.value; applyExFilter(); } });
+document.addEventListener('change', markDirty, true);
 document.addEventListener('submit', function(e){ var f = e.target; if (f.dataset && f.dataset.form) { e.preventDefault(); if (F[f.dataset.form]) F[f.dataset.form](f); } });
 
 /* ---------- boot ---------- */
 function startFirebase(){
   var k = groupKey();
   if (!k) { S.mode = 'nogroup'; render(); return; }
+  try { if (location.hash !== '#k=' + k) history.replaceState(null, '', location.pathname + location.search + '#k=' + k); } catch(e){}
   S.store = firebaseStore(CONFIG, k); S.mode = 'firebase'; start();
 }
 function start(){
   S.store.watch('meta', function(d){ ingest('meta', d); }, 60000);
   S.store.watch('members', function(d){ ingest('members', d); }, 15000);
   S.store.watch('exercises', function(d){ ingest('exercises', d); }, 120000);
+  resumePending();
   render();
 }
 render();
@@ -1545,7 +1775,10 @@ if (window.claude && typeof window.claude.use === 'function') {
   S.store = localStore(); S.mode = 'local'; start();
 }
 var lastDay = todayStr();
-setInterval(function(){ if (todayStr() !== lastDay) { lastDay = todayStr(); scheduleRender(); } }, 60000);
+function checkDay(){ if (todayStr() !== lastDay) { lastDay = todayStr(); autoBackupStarted = false; S.hmReset = true; render(); } }
+setInterval(checkDay, 60000);
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) checkDay(); });
+window.addEventListener('focus', checkDay);
 })();
 </script>
 
