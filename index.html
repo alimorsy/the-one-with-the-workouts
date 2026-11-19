@@ -1085,8 +1085,8 @@ function syncMode(){
 function skinKey(){ return 'fw.skin:' + (S.mode === 'firebase' ? (groupKey() || '') : S.mode); }
 /* Fall background photo (null = the drawn scene): portrait and landscape files in bg/, the veil strength (0-1), and the
    credit line shown at the bottom of every page while it's in use. Made with tools/make_bg.py. */
-var FALL_BG = {p:'bg/levitan-p.webp', l:'bg/levitan-l.webp', veil:.5,
-  credit:[['Isaac Levitan, ', null], ['Golden Autumn', 'https://en.wikipedia.org/wiki/Golden_Autumn'], [' (1895), public domain, via ', null], ['Wikimedia Commons', 'https://commons.wikimedia.org/wiki/File:Levitan_Zolotaya_Osen.jpg']]};
+var FALL_BG = {p:'levitan-p.webp', l:'levitan-l.webp', veil:.5,
+               credit:[['Isaac Levitan, ', null], ['Golden Autumn', 'https://en.wikipedia.org/wiki/Golden_Autumn'], [' (1895), public domain, via ', null], ['Wikimedia Commons', 'https://commons.wikimedia.org/wiki/File:Levitan_Zolotaya_Osen.jpg']]};
 function applyBg(on){
   var sc = document.getElementById('scene'), b = on ? FALL_BG : null, key = b ? b.l : '';
   if (!sc || sc.getAttribute('data-bg') === key) return;
