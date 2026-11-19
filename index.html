@@ -59,14 +59,15 @@ p{margin:0}
 .mepill.empty{padding-left:12px;color:var(--accent);border-color:var(--accent)}
 
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
-.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:60px;color:var(--muted);font-size:.68rem;font-weight:600;letter-spacing:.01em;padding:0 2px}
+/* Tabs share the width by content, so a long label (Leaderboards) gets the room it needs. */
+.nav-in{max-width:680px;margin:0 auto;display:flex}
+.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:60px;color:var(--muted);font-size:.64rem;font-weight:600;letter-spacing:0;padding:0 2px;min-width:0;flex:1 1 auto;white-space:nowrap}
 .nav svg{width:22px;height:22px}
 .nav button[aria-current="page"]{color:var(--accent)}
 .wrap{max-width:680px;margin:0 auto;padding-inline:16px;padding-block:8px 112px}
 @media (min-width:760px){
   .nav{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;border-top:0;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px)}
-  .nav button{flex-direction:row;gap:8px;min-height:48px;font-size:.85rem}
+  .nav button{flex-direction:row;gap:7px;min-height:48px;font-size:.82rem}
   .nav svg{width:18px;height:18px}
   .wrap{padding-block:20px 56px}
 }
@@ -97,8 +98,8 @@ p{margin:0}
 .sec-h.tight{margin-top:18px}
 
 .sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:28px 0 10px}
-.sec-h h2{font-family:var(--f-display);font-weight:800;font-stretch:115%;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em}
-.sec-h span{font-size:.8rem;color:var(--muted)}
+.sec-h h2{font-family:var(--f-display);font-weight:800;font-stretch:115%;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em;flex:none}
+.sec-h span{font-size:.8rem;color:var(--muted);text-align:right}
 
 /* member cards */
 .lineup{display:grid;gap:10px}
@@ -168,7 +169,7 @@ button.chip:active{transform:scale(.97)}
 .legend .cell.late::after{width:4px;height:4px;right:1px;top:1px}
 
 /* standings */
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .srow{display:grid;grid-template-columns:1.4rem 32px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid var(--line)}
 .srow:first-child{border-top:0}
 .rank{font-family:var(--f-display);font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -285,6 +286,57 @@ select:disabled{opacity:.75;background-image:none;padding-right:12px}
 @media (min-width:760px){.toast{bottom:24px}}
 .loading{padding:48px 0;text-align:center;color:var(--muted)}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em}
+/* medals, leaderboards, recap */
+:root{--gold:#E3B11E;--silver:#B9C2CC;--bronze:#C0753A}
+.fchips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fchips::-webkit-scrollbar{display:none}
+.fchip{flex:none;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:0 13px;min-height:36px;font-weight:700;font-size:.84rem;color:var(--fg)}
+.fchip[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.lbrow{grid-template-columns:28px 32px minmax(0,1fr) auto}
+.lbrow.me{background:color-mix(in srgb,var(--mc) 7%,var(--surface))}
+.rk{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:850;font-size:.8rem;background:var(--surface-2);color:var(--muted);font-variant-numeric:tabular-nums}
+.rk.r1{background:var(--gold);color:#3A2A00}
+.rk.r2{background:var(--silver);color:#1E2630}
+.rk.r3{background:var(--bronze);color:#FFFFFF}
+.lbdesc{font-size:.82rem;color:var(--muted);margin:2px 0 10px}
+button.srow{width:100%;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:inherit}
+button.srow:first-child{border-top:0}
+.lbmini{grid-template-columns:minmax(0,6.6rem) minmax(0,1fr) auto;padding-block:9px}
+.lbmini[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.lbmini .lbl{color:var(--muted);font-size:.8rem}
+.who2{display:flex;align-items:center;gap:8px;min-width:0}
+.who2 .stack{display:flex;flex:none}
+.who2 .stack .avatar+.avatar{margin-left:-9px;box-shadow:0 0 0 2px var(--surface)}
+.who2 .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.star{display:inline-grid;place-items:center;filter:drop-shadow(0 0 .6px rgba(0,0,0,.8)) drop-shadow(0 0 .5px rgba(0,0,0,.6))}
+.star b{display:block;width:11px;height:11px;background:var(--bronze);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.star.s2 b{background:var(--silver)}
+.star.s3 b{background:var(--gold)}
+.cell .star{position:absolute;left:1px;top:1px;display:block;pointer-events:none}
+.cell .star b{width:9px;height:9px}
+@media (min-width:560px){ .cell .star{left:2px;top:2px} .cell .star b{width:11px;height:11px} }
+.mhead .star b{width:17px;height:17px}
+.legend .star b{width:12px;height:12px}
+/* recap */
+.recap-hero{display:grid;gap:12px;padding-block:6px 4px}
+.recap-title{font-family:var(--f-display);font-weight:900;font-stretch:125%;font-size:clamp(2.1rem,10vw,3.4rem);line-height:.92;text-transform:uppercase}
+.recap-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:560px){ .recap-stats{grid-template-columns:repeat(4,minmax(0,1fr))} }
+.awards{display:grid;gap:12px}
+@media (min-width:600px){ .awards{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.award{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.aw-who{display:flex;align-items:center;gap:10px;min-width:0}
+.aw-who .avatar{width:40px;height:40px;font-size:1.05rem}
+.award .ttl{font-family:var(--f-display);font-weight:850;font-stretch:115%;font-size:1.3rem;line-height:1.1}
+.award .blurb{font-size:.95rem;line-height:1.5;white-space:pre-line}
+.award .mini{display:flex;flex-wrap:wrap;gap:6px}
+.award .mini span{font-size:.76rem;font-weight:700;background:var(--surface-2);color:var(--muted);border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
+.ribbon{margin-left:auto;width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--mc) 16%,var(--surface));color:var(--mc)}
+.ribbon svg{width:18px;height:18px}
+#fx,#leaves{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#fx{z-index:40}
+/* behind the page content: leaves show in the gaps between cards, never over text */
+#leaves{z-index:-1}
 @supports not (color: color-mix(in srgb, red 50%, blue)) {
   .cell.part{background:var(--mc);opacity:.5}
   .cell.full{background:var(--mc)}
@@ -296,13 +348,92 @@ select:disabled{opacity:.75;background-image:none;padding-right:12px}
   .chip,.cell,.dbtn,.btn{transition:transform .12s ease,background-color .2s ease,border-color .2s ease}
   .teambar .seg i,.bar i{transition:width .35s ease}
 }
+/* Fall theme (chosen per challenge: settings.theme = "fall"). Same layout; harvest palette and leaf-shaped marks.
+   Member colors are left alone so everyone keeps their color. */
+:root[data-skin="fall"]{
+  --bg:#F2E7D8; --surface:#FFFAF2; --surface-2:#EADCC6; --line:#DCC8AC;
+  --fg:#2B1A10; --muted:#7A604C; --accent:#B8430F; --accent-ink:#FFFFFF;
+  --done:#3E7B35; --skip:#B42318; --on-m:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="fall"]:not([data-theme="light"]){
+    --bg:#16100C; --surface:#211812; --surface-2:#2D221A; --line:#3E3026;
+    --fg:#F4E8DA; --muted:#B69E89; --accent:#F28C3A; --accent-ink:#1C1007;
+    --done:#7FBF6E; --skip:#F2785F; --on-m:#16100C;
+    color-scheme:dark;
+  }
+}
+:root[data-skin="fall"][data-theme="dark"]{
+  --bg:#16100C; --surface:#211812; --surface-2:#2D221A; --line:#3E3026;
+  --fg:#F4E8DA; --muted:#B69E89; --accent:#F28C3A; --accent-ink:#1C1007;
+  --done:#7FBF6E; --skip:#F2785F; --on-m:#16100C;
+  color-scheme:dark;
+}
+:root[data-skin="fall"] .brand .mark i{width:8px;height:12px;border-radius:8px 0 8px 0}
+:root[data-skin="fall"] .eyebrow{color:var(--accent)}
+/* The scene: a fixed autumn landscape behind the page (sky, sun, hills, two trees). Cards stay opaque, and text that
+   sits straight on the scene gets a soft halo in the page color, so it reads on any part of the picture. */
+#scene{display:none}
+:root[data-skin="fall"]{background:var(--bg);
+  --sky1:#FBF1E4; --sky2:#F8E2C8; --sky3:#F3CFA8; --sun:#FFE3A6;
+  --hl1:#F3D8B6; --hl2:#EDC398; --hl3:#E4AE7E; --trunk:#8A5A3B;
+  --fo1:#E8833A; --fo2:#F2A93B; --fo3:#D9542C; --fo4:#F5C451; --fo5:#FFE08A}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="fall"]:not([data-theme="light"]){
+    --sky1:#100A07; --sky2:#1A110C; --sky3:#2A1A11; --sun:#F1DDB4;
+    --hl1:#22170F; --hl2:#2C1D13; --hl3:#362317; --trunk:#4A3324;
+    --fo1:#A8481B; --fo2:#B97A26; --fo3:#8E3418; --fo4:#C49A3A; --fo5:#D8B060}
+}
+:root[data-skin="fall"][data-theme="dark"]{
+  --sky1:#100A07; --sky2:#1A110C; --sky3:#2A1A11; --sun:#F1DDB4;
+  --hl1:#22170F; --hl2:#2C1D13; --hl3:#362317; --trunk:#4A3324;
+  --fo1:#A8481B; --fo2:#B97A26; --fo3:#8E3418; --fo4:#C49A3A; --fo5:#D8B060}
+:root[data-skin="fall"] body{background:transparent}
+:root[data-skin="fall"] #scene{display:block;position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 45%,var(--sky3) 100%)}
+#scene svg{position:absolute;display:block}
+.sc-sun{position:absolute;right:9%;top:13%;width:min(30vmin,240px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--sun) 0 52%,transparent 71%);opacity:.75}
+.sc-hills{left:0;bottom:0;width:100%;height:40vh}
+.sc-tree.l{left:max(-60px,calc(50% - 560px));bottom:15vh;height:min(50vh,470px);width:auto;aspect-ratio:240/330}
+.sc-tree.r{right:max(-44px,calc(50% - 520px));bottom:18vh;height:min(36vh,340px);width:auto;aspect-ratio:200/290}
+#scene .h1{fill:var(--hl1)} #scene .h2{fill:var(--hl2)} #scene .h3{fill:var(--hl3)} #scene .tr{fill:var(--trunk)}
+#scene .f1,#scene .l1{fill:var(--fo1)} #scene .f2,#scene .l2{fill:var(--fo2)} #scene .f3,#scene .l3{fill:var(--fo3)} #scene .f4{fill:var(--fo4)} #scene .f5{fill:var(--fo5)}
+#scene .cn{opacity:.92}
+/* Phones: smaller trees that peek in from the sides below the hero, so the middle of the screen stays calm. */
+@media (max-width:700px){
+  .sc-hills{height:34vh}
+  .sc-tree.l{left:-92px;bottom:9vh;height:36vh}
+  .sc-tree.r{right:-72px;bottom:12vh;height:28vh}
+  #scene .cn{opacity:.82}
+}
+@media (prefers-color-scheme: dark){ :root[data-skin="fall"]:not([data-theme="light"]) .sc-sun{opacity:.2} :root[data-skin="fall"]:not([data-theme="light"]) #scene .cn{opacity:.8} }
+:root[data-skin="fall"][data-theme="dark"] .sc-sun{opacity:.2}
+:root[data-skin="fall"] :is(.brand,.eyebrow,.daynum,.dateline,.teamlabel,.sec-h,.lead,.page-h,.legend,.recap-title,.lbdesc,.empty-line,.wrap > .hint,.hint[style]){text-shadow:0 0 2px var(--bg),0 0 6px var(--bg),0 0 12px var(--bg)}
 </style>
 
+<div id="scene" aria-hidden="true">
+  <div class="sc-sun"></div>
+  <svg class="sc-hills" viewBox="0 0 400 200" preserveAspectRatio="none">
+    <path class="h1" d="M0 62C55 34 118 40 176 58C236 77 302 30 400 48V200H0Z"/>
+    <path class="h2" d="M0 104C66 80 138 96 204 108C266 120 334 84 400 96V200H0Z"/>
+    <path class="h3" d="M0 148C82 132 160 140 240 148C302 154 352 138 400 142V200H0Z"/>
+    <g class="gl"><ellipse class="l1" cx="40" cy="168" rx="4" ry="1.6"/><ellipse class="l2" cx="88" cy="176" rx="3.5" ry="1.4"/><ellipse class="l3" cx="140" cy="165" rx="3" ry="1.3"/><ellipse class="l1" cx="214" cy="178" rx="4" ry="1.5"/><ellipse class="l2" cx="268" cy="166" rx="3.5" ry="1.4"/><ellipse class="l3" cx="330" cy="174" rx="4" ry="1.6"/><ellipse class="l1" cx="372" cy="162" rx="3" ry="1.2"/></g>
+  </svg>
+  <svg class="sc-tree l" viewBox="0 0 240 330">
+    <path class="tr" d="M108 330C113 280 111 238 105 204L92 176C102 178 110 188 114 196C116 174 118 152 115 128H124C124 150 124 170 126 190C133 174 143 162 154 155L160 161C148 172 138 188 134 208C129 240 131 284 138 330Z"/>
+    <g class="cn"><circle class="f3" cx="46" cy="160" r="34"/><circle class="f2" cx="196" cy="158" r="33"/><circle class="f1" cx="70" cy="118" r="46"/><circle class="f3" cx="176" cy="114" r="48"/><circle class="f4" cx="96" cy="62" r="40"/><circle class="f1" cx="150" cy="56" r="42"/><circle class="f2" cx="120" cy="92" r="56"/><circle class="f4" cx="120" cy="140" r="42"/><circle class="f2" cx="58" cy="86" r="28"/><circle class="f4" cx="188" cy="78" r="28"/><circle class="f5" cx="108" cy="70" r="15"/><circle class="f5" cx="160" cy="100" r="11"/><circle class="f5" cx="70" cy="112" r="9"/></g>
+    <g class="lf"><ellipse class="f3" cx="30" cy="236" rx="5" ry="2.4" transform="rotate(-30 30 236)"/><ellipse class="f4" cx="214" cy="214" rx="5" ry="2.4" transform="rotate(25 214 214)"/><ellipse class="f1" cx="186" cy="268" rx="4.5" ry="2.2" transform="rotate(-15 186 268)"/></g>
+  </svg>
+  <svg class="sc-tree r" viewBox="0 0 200 290">
+    <path class="tr" d="M92 290C96 250 95 214 90 186L80 166C88 168 94 176 97 182C98 164 99 148 97 130H105C105 148 105 162 107 178C112 166 120 158 128 153L133 158C124 166 117 180 114 196C110 226 112 256 116 290Z"/>
+    <g class="cn"><circle class="f4" cx="40" cy="140" r="30"/><circle class="f1" cx="160" cy="138" r="30"/><circle class="f3" cx="62" cy="102" r="40"/><circle class="f2" cx="142" cy="100" r="40"/><circle class="f3" cx="100" cy="58" r="38"/><circle class="f4" cx="100" cy="98" r="46"/><circle class="f1" cx="100" cy="132" r="34"/><circle class="f5" cx="88" cy="74" r="12"/><circle class="f5" cx="128" cy="110" r="9"/></g>
+  </svg>
+</div>
 <header class="topbar" id="topbar"></header>
 <nav class="nav" id="nav" aria-label="Sections"></nav>
 <main class="wrap" id="app"><div class="loading">Loading the board…</div></main>
 <div class="toast" id="toast" role="status" hidden></div>
 <input type="file" id="bk-file" accept=".json,application/json" data-chg="restorefile" tabindex="-1" aria-hidden="true" style="position:fixed;left:-100px;top:0;width:1px;height:1px;opacity:0">
+<input type="file" id="recap-file" accept=".json,application/json" data-chg="recapfile" tabindex="-1" aria-hidden="true" style="position:fixed;left:-100px;top:0;width:1px;height:1px;opacity:0">
 
 <script>
 (function(){
@@ -315,7 +446,7 @@ var LS = {
   set: function(k,v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){} }
 };
 var $app = document.getElementById('app'), $top = document.getElementById('topbar'), $nav = document.getElementById('nav'), $toast = document.getElementById('toast');
-var VIEWS = ['board','plan','plans','exercises','group'];
+var VIEWS = ['board','plan','leaders','plans','exercises','group','recap'];
 var S = {
   mode: 'loading', store: null,
   data: { meta:{}, members:{}, exercises:{} },
@@ -327,6 +458,7 @@ var S = {
   exQuery: '', colorFor: null, applying: null, draft: null, stripScroll: null
 };
 var RO_MSG = "You can see the board but can't save changes here. Ask the owner to give you edit access.";
+var FROZEN_MSG = "This challenge is finished, so it can't be changed. It can be reopened in Group.";
 
 /* ---------- built-in exercise catalog (reference content; stored edits override it) ---------- */
 var LW = ['3 sets of 8','3 sets of 10','4 sets of 10'];
@@ -358,6 +490,10 @@ var CATALOG = {
   'lat-pulldown': X('Lat Pulldown','weights',LW,'lat-pulldown-with-pronated-grip','Lats · biceps, upper back'),
   'hip-thrust': X('Hip Thrust','weights',LW,'hip-thrust','Glutes · hamstrings'),
   'calf-raise': X('Calf Raise','weights',['3 sets of 12','3 sets of 15','4 sets of 20'],'standing-calf-raise','Calves'),
+  'brisk-walk': X('Brisk walk','cardio',['20 minutes','30 minutes','45 minutes'],null,'Heart and lungs · legs'),
+  'running': X('Running','cardio',['15 minutes easy','20 minutes easy','30 minutes'],null,'Heart and lungs · legs, glutes'),
+  'cycling': X('Cycling','cardio',['15 minutes','25 minutes','40 minutes'],null,'Heart and lungs · quads, glutes'),
+  'jump-rope': X('Jump rope','cardio',['5 rounds of 1 minute','8 rounds of 1 minute','10 rounds of 1 minute'],null,'Heart and lungs · calves, shoulders'),
   'banana-wall-stretch': X('Banana wall stretch','stretch',['Hold 15 seconds each side'],null,'Obliques, lats'),
   'elephant-walks': X('Elephant walks','stretch',['2 Sets of 15'],null,'Hamstrings, calves'),
   'butterfly-stretch': X('Butterfly stretch','stretch',['30 second flutters'],null,'Inner thighs, hips'),
@@ -410,8 +546,14 @@ function dateOf(i){ return new Date(parseD(settings().startDate) + i*DAY); }
 function weekday(i){ return dateOf(i).getUTCDay(); }
 function fmt(i, o){ try { return dateOf(i).toLocaleDateString(undefined, Object.assign({timeZone:'UTC'}, o)); } catch(e){ return ''; } }
 function wdName(w){ try { return new Date(Date.UTC(2026, 9, 11 + w)).toLocaleDateString(undefined, {weekday:'short', timeZone:'UTC'}); } catch(e){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][w]; } }
-function canLog(d){ var t = dayIdx(); return d >= 0 && (d === t || d === t - 1); }
-function canEditPlan(d){ return d >= dayIdx(); }
+/* settings.completed: the challenge is over and this link is a read-only recap.
+   settings.rules: 2 = streaks need one exercise a day (rest days break them) and daily stars; missing = the original rules.
+   settings.theme: 'fall' or classic (missing). */
+function frozen(){ var st = settings(); return !!(st && st.completed); }
+function rules(){ var st = settings(); return (st && +st.rules) || 1; }
+function skin(){ var st = settings(); return st && st.theme === 'fall' ? 'fall' : 'classic'; }
+function canLog(d){ if (frozen()) return false; var t = dayIdx(); return d >= 0 && (d === t || d === t - 1); }
+function canEditPlan(d){ return !frozen() && d >= dayIdx(); }
 var IC = {
   board:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 14h3M7.5 17h6"/></svg>',
@@ -424,11 +566,16 @@ var IC = {
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
   left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
   right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
-  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>'
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+  leaders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 6H5.5a2.5 2.5 0 0 0 2.6 4M16 6h2.5a2.5 2.5 0 0 1-2.6 4M12 13v4M8.5 20.5h7M9.5 17h5"/></svg>',
+  recap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5.5"/><path d="M8.6 10.6 6 3h4l2 5 2-5h4l-2.6 7.6"/></svg>'
 };
-var LABEL = {board:'Board', plan:'My plan', plans:'Plans', exercises:'Exercises', group:'Group'};
-var KINDS = ['bodyweight','weights','stretch','rest'];
-var KIND_LABEL = {bodyweight:'Bodyweight', weights:'Weights', stretch:'Stretches', rest:'Rest'};
+var LABEL = {board:'Board', plan:'My plan', leaders:'Leaderboards', plans:'Plans', exercises:'Exercises', group:'Group', recap:'Recap'};
+var KINDS = ['bodyweight','weights','cardio','stretch','rest'];
+var KIND_LABEL = {bodyweight:'Bodyweight', weights:'Weights', cardio:'Cardio', stretch:'Stretches', rest:'Rest'};
+/* Exercise types for the daily stars: bodyweight and weights both count as strength. */
+var TYPE_OF = {bodyweight:'strength', weights:'strength', cardio:'cardio', stretch:'stretch'};
+var MEDAL = ['', 'bronze', 'silver', 'gold'];
 
 /* ---------- domain ---------- */
 function members(){
@@ -463,7 +610,7 @@ function refLink(e){
   if (!e || e.kind === 'rest') return null;
   if (e.url && /^https?:\/\//i.test(e.url)) return {href:e.url, label:'How to do it'};
   if (e.ref) return {href:'https://www.strengthlog.com/' + e.ref + '/', label:'Form and muscles'};
-  return {href:'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.name + (e.kind === 'stretch' ? ' stretch' : ' exercise') + ' how to'), label:'Watch how'};
+  return {href:'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.name + (e.kind === 'stretch' ? ' stretch how to' : e.kind === 'cardio' ? ' technique for beginners' : ' exercise how to')), label:'Watch how'};
 }
 function refHtml(e){ var r = refLink(e); return r ? '<a class="reflink" href="' + esc(r.href) + '" target="_blank" rel="noopener">' + esc(r.label) + ' ↗</a>' : ''; }
 function isRest(it){ if (it.ex === 'rest') return true; var e = ex(it.ex); return !!(e && e.kind === 'rest'); }
@@ -481,15 +628,65 @@ function dayStat(m, i){
     rest: items.length > 0 && work.length === 0, empty: items.length === 0,
     complete: work.length > 0 && done === work.length };
 }
-function streak(okFn){
-  var t = dayIdx(), L = len(); if (t < 0) return 0;
-  var i = Math.min(t, L-1), n = 0;
-  if (okFn(i) !== true) i--;
-  for (; i >= 0; i--) { var ok = okFn(i); if (ok === true) n++; else if (ok === null) continue; else break; }
+/* Streak runs over days a..b. okFn(i): true = the day counts, false = it breaks the run, null = it's skipped.
+   Today never breaks a run (it's still in progress); it only adds once it counts. */
+function runs(okFn, a, b){
+  var t = dayIdx(), best = 0, cur = 0;
+  for (var i=Math.max(a,0); i<=b; i++){
+    var ok = okFn(i);
+    if (ok === true) { cur++; if (cur > best) best = cur; }
+    else if (ok === null || i === t) continue;
+    else cur = 0;
+  }
+  return {best:best, cur:cur};
+}
+function streak(okFn){ var t = dayIdx(); return t < 0 ? 0 : runs(okFn, 0, Math.min(t, len()-1)).cur; }
+/* Rules 1 (first challenge): a day counts when every planned exercise is done; days with nothing to do are skipped.
+   Rules 2: a day counts when at least one exercise is done; any day without one, rest days included, breaks the streak. */
+function memberOk(m){
+  if (rules() >= 2) return function(i){ return dayStat(m, i).done > 0; };
+  return function(i){ var s = dayStat(m, i); return s.total ? s.complete : null; };
+}
+function hasPlan(m){ return (m.plan || []).some(function(d){ return d && d.items && d.items.some(function(it){ return !isRest(it); }); }); }
+function teamOk(ms){
+  if (rules() >= 2) {
+    var act = ms.filter(hasPlan);   /* someone with nothing planned all challenge can't hold the team back */
+    return function(i){ if (!act.length) return null; for (var k=0;k<act.length;k++) if (!dayStat(act[k], i).done) return false; return true; };
+  }
+  return function(i){ var any = false; for (var k=0;k<ms.length;k++){ var s = dayStat(ms[k], i); if (s.total){ any = true; if (!s.complete) return false; } } return any ? true : null; };
+}
+/* Daily star: how many exercise types (strength, cardio, stretches) had at least one exercise done. 1 bronze, 2 silver, 3 gold. */
+function medal(m, i){
+  if (rules() < 2) return 0;
+  var items = (m.plan && m.plan[i] && m.plan[i].items) || [], log = (m.log && m.log[i]) || {}, seen = {}, n = 0;
+  items.forEach(function(it){ var e = log[it.id]; if (!e || e.s !== 'done') return; var x = ex(it.ex), k = x && TYPE_OF[x.kind]; if (k && !seen[k]) { seen[k] = 1; n++; } });
   return n;
 }
-function memberOk(m){ return function(i){ var s = dayStat(m, i); return s.total ? s.complete : null; }; }
-function teamOk(ms){ return function(i){ var any = false; for (var k=0;k<ms.length;k++){ var s = dayStat(ms[k], i); if (s.total){ any = true; if (!s.complete) return false; } } return any ? true : null; }; }
+function starHtml(n, label){ return n ? '<span class="star s' + n + '"' + (label ? ' role="img" aria-label="' + esc(label) + '"' : ' aria-hidden="true"') + '><b></b></span>' : ''; }
+function medalLabel(n){ return n ? MEDAL[n].charAt(0).toUpperCase() + MEDAL[n].slice(1) + ' star: ' + n + ' exercise type' + (n === 1 ? '' : 's') + ' done' : ''; }
+/* Everything the leaderboards and the recap rank by, for days a..b (never past today). */
+function mstats(m, a, b){
+  var t = dayIdx(), L = len(); b = Math.min(b, t, L-1);
+  var r = {done:0, total:0, full:0, workouts:0, planned:0, late:0, skip:0, stars:0, gold:0, silver:0, bronze:0, variety:0, best:0, cur:0, pct:0, days: Math.max(0, b - a + 1)};
+  var seen = {};
+  for (var i=Math.max(a,0); i<=b; i++){
+    var s = dayStat(m, i);
+    r.done += s.done; r.total += s.total; r.late += s.late; r.skip += s.skip;
+    if (s.total) r.planned++;
+    if (s.complete) r.full++;
+    if (s.done) r.workouts++;
+    var md = medal(m, i); if (md) { r.stars += md; r[MEDAL[md]]++; }
+    s.items.forEach(function(it){ var e = s.log[it.id]; if (e && e.s === 'done' && !isRest(it)) seen[it.ex] = 1; });
+  }
+  r.variety = Object.keys(seen).length;
+  /* Rounded down so 100% only ever means everything; rankings use the exact share. */
+  r.ratio = r.total ? r.done / r.total : 0;
+  r.pct = Math.floor(r.ratio * 100 + 1e-9);
+  var rr = runs(memberOk(m), a, b); r.best = rr.best; r.cur = rr.cur;
+  return r;
+}
+/* Competition ranking (1, 1, 3): higher values rank first. */
+function ranks(vals){ return vals.map(function(v){ return 1 + vals.filter(function(w){ return w > v; }).length; }); }
 function soFar(m){
   var t = Math.min(dayIdx(), len()-1), d = 0, tot = 0;
   for (var i=0;i<=t;i++){ var s = dayStat(m, i); d += s.done; tot += s.total; }
@@ -589,6 +786,7 @@ function firebaseStore(cfg, code){
     kind:'firebase',
     watch: function(col, cb, every){ W[col] = {cb:cb, err:0, every:every || 30000, last:0, seq:0, applied:0}; refresh(col); },
     poke: function(col){ if (W[col] && Date.now() - (lastPoke[col] || 0) > 20000) { lastPoke[col] = Date.now(); refresh(col); } },
+    every: function(col, ms){ if (W[col]) W[col].every = ms; },
     put: function(col,id,data){ return http('PATCH', col, id, {fields:{json:{stringValue: JSON.stringify(data)}}}); },
     remove: function(col,id){ return http('DELETE', col, id); },
     get: function(col,id){
@@ -650,6 +848,8 @@ function setLocal(col, id, doc){
 }
 function mutate(col, id, fn){
   if (S.readOnly) { toast(RO_MSG); return; }
+  /* A finished challenge only takes changes to its settings (to reopen it, set its look) and its award texts. */
+  if (frozen() && !(col === 'meta' && (id === 'settings' || id === 'recap'))) { toast(FROZEN_MSG); return; }
   var k = col + '/' + id, q = queues[k] || (queues[k] = {col:col, id:id, fns:[], running:false, tries:0, timer:null});
   var e = {fn:fn};
   var cur = S.data[col][id] ? clone(S.data[col][id]) : null;
@@ -741,6 +941,8 @@ function ingest(col, docs){
   }
   if (S.got[col] && JSON.stringify(next) === JSON.stringify(S.data[col])) return;
   S.data[col] = next; S.got[col] = true;
+  /* A finished challenge doesn't change: poll it rarely. */
+  if (col === 'meta' && S.store && S.store.every) { var fz = frozen(); S.store.every('members', fz ? 600000 : 15000); S.store.every('exercises', fz ? 600000 : 120000); }
   scheduleRender();
   maybeAutoBackup();
 }
@@ -792,7 +994,7 @@ function pruneBackups(){
   });
 }
 function maybeAutoBackup(){
-  if (autoBackupStarted || !S.store || !S.store.get || S.readOnly) return;
+  if (autoBackupStarted || !S.store || !S.store.get || S.readOnly || frozen()) return;
   if (!S.got.meta || !S.got.members || !S.got.exercises || !settings() || !members().length) return;
   autoBackupStarted = true;
   setTimeout(function(){
@@ -844,13 +1046,36 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(function(){ $toast.hidden = true; }, 3200);
 }
 function setView(v){
-  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null; S.pendingRestore = null; S.pendingShift = null;
+  S.view = v; S.confirmKey = null; S.showWho = false; S.stripScroll = null; S.colorFor = null; S.pendingRestore = null; S.pendingShift = null; S.editAward = null;
+  if (v === 'recap') S.celebrate = true;
   if (v === 'group' && S.bk.status === 'ready') loadBackups();
   if (S.mode !== 'firebase') { try { history.replaceState(null, '', '#' + v); } catch(e){} }
   render(); window.scrollTo(0, 0);
 }
 
+/* Which tabs exist depends on whether the challenge is finished; the first time a finished challenge
+   loads (or it gets finished while open), the recap opens with confetti. */
+function views(){ return frozen() ? ['recap','board','leaders','plans','exercises','group'] : ['board','plan','leaders','plans','exercises','group']; }
+function syncMode(){
+  if (!S.got.meta || !S.got.members) return;
+  var fz = frozen();
+  if (fz !== S.wasFrozen) { S.wasFrozen = fz; if (fz) { S.view = 'recap'; S.celebrate = true; S.boardDay = null; } }
+  if (views().indexOf(S.view) < 0) S.view = fz ? 'recap' : 'board';
+}
+function skinKey(){ return 'fw.skin:' + (S.mode === 'firebase' ? (groupKey() || '') : S.mode); }
+function applySkin(){
+  var sk = settings() ? skin() : LS.get(skinKey()), root = document.documentElement;
+  if (sk === 'fall') root.setAttribute('data-skin', 'fall'); else root.removeAttribute('data-skin');
+  if (sk !== S.shownSkin) {
+    S.shownSkin = sk;
+    var tc = document.querySelector('meta[name="theme-color"]'), bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    if (tc && bg) tc.setAttribute('content', bg);
+  }
+  if (settings()) LS.set(skinKey(), sk === 'fall' ? 'fall' : null);   /* remembered so the next load starts in the right look */
+  leaves(sk === 'fall' && LS.get('fw.leaves') !== 'off');
+}
 function render(){
+  syncMode(); applySkin();
   var hw = $app.querySelector('.hm-wrap'); var hmScroll = hw ? hw.scrollLeft : null;
   var st0 = $app.querySelector('.strip'); if (st0) S.stripScroll = st0.scrollLeft;
   /* Unsaved values in open forms survive any redraw (keyed per form, so switching forms never leaks values). */
@@ -869,6 +1094,8 @@ function render(){
   else if (S.view === 'plans') html = viewPlans();
   else if (S.view === 'exercises') html = viewExercises();
   else if (S.view === 'group') html = viewGroup();
+  else if (S.view === 'leaders') html = viewLeaders();
+  else if (S.view === 'recap') html = viewRecap();
   else html = viewBoard();
   $app.innerHTML = html;
   var noKeep = S.noKeep; S.noKeep = null;
@@ -908,6 +1135,7 @@ function render(){
   }
   if (S.view === 'exercises') applyExFilter();
   maybeAutoBackup();
+  if (S.celebrate && S.view === 'recap' && S.got.members) { S.celebrate = false; setTimeout(celebrate, 200); }
 }
 function renderTop(){
   var m = me(), ms = members().slice(0, 5);
@@ -919,9 +1147,110 @@ function renderTop(){
   $top.innerHTML = '<div class="brand">' + mark + '<span>' + title + '</span></div>' + pill;
 }
 function renderNav(){
-  $nav.innerHTML = '<div class="nav-in">' + VIEWS.map(function(v){
+  var vs = S.got.meta ? views() : ['board','plan','leaders','plans','exercises','group'];
+  $nav.innerHTML = '<div class="nav-in">' + vs.map(function(v){
     return '<button data-act="nav" data-view="' + v + '"' + (S.view === v ? ' aria-current="page"' : '') + '>' + IC[v] + '<span>' + LABEL[v] + '</span></button>';
   }).join('') + '</div>';
+}
+
+/* ---------- motion: falling leaves (Fall theme) and confetti (recap) ----------
+   Both draw on a fixed canvas that ignores taps, and both stay off when the device asks for reduced motion. */
+function calm(){ try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ return false; } }
+function fitCanvas(cv){
+  var r = Math.min(window.devicePixelRatio || 1, 2), w = window.innerWidth, h = window.innerHeight;
+  if (cv.width !== Math.round(w * r) || cv.height !== Math.round(h * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); }
+  var ctx = cv.getContext('2d'); ctx.setTransform(r, 0, 0, r, 0, 0);
+  return {ctx:ctx, w:w, h:h};
+}
+var LV = {on:false, cv:null, raf:0, list:[], last:0};
+var LEAF_COLORS = ['#C2410C','#D97706','#B45309','#9A3412','#CA8A04','#B91C1C','#A16207'];
+var LEAF_COLORS_DARK = ['#F28C3A','#E8A33D','#D9622B','#E3B11E','#C9772E','#E0533A'];
+function isDark(){ var t = document.documentElement.getAttribute('data-theme'); if (t) return t === 'dark'; try { return matchMedia('(prefers-color-scheme: dark)').matches; } catch(e){ return false; } }
+function newLeaf(w, h, top){
+  var dk = isDark(), pal = dk ? LEAF_COLORS_DARK : LEAF_COLORS;
+  return {x: Math.random() * w, y: top ? -30 - Math.random() * 60 : Math.random() * h, s: 7 + Math.random() * 7,
+    vy: 22 + Math.random() * 30, sway: 14 + Math.random() * 22, ph: Math.random() * 6.28, fs: .5 + Math.random() * .9,
+    rot: Math.random() * 6.28, vr: (Math.random() - .5) * 1.6, flip: Math.random() * 6.28, vf: 1 + Math.random() * 2,
+    c: pal[Math.floor(Math.random() * pal.length)], a: dk ? .3 + Math.random() * .3 : .45 + Math.random() * .35};
+}
+function leaves(on){
+  on = !!on && !calm();
+  if (on === LV.on) return;
+  LV.on = on;
+  if (!on) { cancelAnimationFrame(LV.raf); if (LV.cv) LV.cv.remove(); LV.cv = null; LV.list = []; return; }
+  var cv = LV.cv = document.createElement('canvas'); cv.id = 'leaves'; cv.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(cv, document.body.firstChild);
+  var f = fitCanvas(cv), n = Math.round(clamp(f.w / 45, 8, 22));
+  for (var i=0;i<n;i++) LV.list.push(newLeaf(f.w, f.h, false));
+  LV.last = 0;
+  function frame(ts){
+    if (!LV.on) return;
+    var dt = LV.last ? Math.min(.05, (ts - LV.last) / 1000) : 0; LV.last = ts;
+    var g = fitCanvas(cv), ctx = g.ctx;
+    ctx.clearRect(0, 0, g.w, g.h);
+    LV.list.forEach(function(L, k){
+      L.ph += L.fs * dt; L.y += L.vy * dt; L.rot += L.vr * dt; L.flip += L.vf * dt;
+      var x = L.x + Math.sin(L.ph) * L.sway;
+      if (L.y > g.h + 30) { LV.list[k] = newLeaf(g.w, g.h, true); return; }
+      ctx.save(); ctx.translate(x, L.y); ctx.rotate(L.rot); ctx.scale(Math.max(.25, Math.abs(Math.cos(L.flip))), 1);
+      ctx.globalAlpha = L.a; ctx.fillStyle = L.c;
+      ctx.beginPath(); ctx.moveTo(0, -L.s); ctx.quadraticCurveTo(L.s * .85, -L.s * .15, 0, L.s); ctx.quadraticCurveTo(-L.s * .85, -L.s * .15, 0, -L.s); ctx.fill();
+      ctx.globalAlpha = L.a * .6; ctx.strokeStyle = 'rgba(60,25,5,.55)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, -L.s * .75); ctx.lineTo(0, L.s * 1.25); ctx.stroke();
+      ctx.restore();
+    });
+    LV.raf = requestAnimationFrame(frame);
+  }
+  LV.raf = requestAnimationFrame(frame);
+}
+/* Confetti: cannon bursts from the bottom corners (three waves), plus a shower from the top that keeps
+   coming for about 5 seconds. Pieces flutter down slowly; the whole thing runs about 10 seconds. */
+function celebrate(){
+  if (calm()) return;
+  var old = document.getElementById('fx'); if (old) old.remove();
+  var cv = document.createElement('canvas'); cv.id = 'fx'; cv.setAttribute('aria-hidden', 'true'); document.body.appendChild(cv);
+  var f = fitCanvas(cv), cs = getComputedStyle(document.documentElement), cols = ['#E3B11E', '#F2C94C'];
+  for (var c=0;c<NCOL;c++) { var v = cs.getPropertyValue('--m' + c).trim(); if (v) cols.push(v); }
+  var parts = [], scale = clamp(f.w / 390, 1, 2.2);
+  function piece(o){
+    var round = Math.random() < .2, big = Math.random() < .15;
+    parts.push(Object.assign({w: round ? 0 : (9 + Math.random() * 7) * (big ? 1.5 : 1), h: round ? 0 : 5 + Math.random() * 5, r: round ? 3.5 + Math.random() * 3 : 0,
+      rot: Math.random() * 6.28, vr: (Math.random() - .5) * 10, fl: Math.random() * 6.28, vf: 3 + Math.random() * 7,
+      ph: Math.random() * 6.28, sw: 25 + Math.random() * 45, c: cols[Math.floor(Math.random() * cols.length)]}, o));
+  }
+  function burst(n, delay){
+    for (var i=0;i<n;i++){
+      var left = i % 2 === 0, ang = Math.PI / 2 - (.2 + Math.random() * .6), sp = f.h * (1.05 + Math.random() * .85);
+      piece({x: left ? -10 : f.w + 10, y: f.h * (.7 + Math.random() * .15), vx: Math.cos(ang) * sp * (left ? 1 : -1) * .62, vy: -Math.sin(ang) * sp, delay: delay + Math.random() * .3});
+    }
+  }
+  burst(Math.round(240 * scale), 0);
+  burst(Math.round(150 * scale), 1.1);
+  burst(Math.round(100 * scale), 2.6);
+  for (var k=0, n=Math.round(230 * scale); k<n; k++) piece({x: Math.random() * f.w, y: -20 - Math.random() * 80, vx: (Math.random() - .5) * 60, vy: 40 + Math.random() * 80, delay: .4 + Math.random() * 4.8});
+  var t0 = 0, last = 0, END = 10;
+  function frame(ts){
+    if (!t0) { t0 = ts; last = ts; }
+    var dt = Math.min(.04, (ts - last) / 1000), el = (ts - t0) / 1000; last = ts;
+    var g = fitCanvas(cv), ctx = g.ctx, alive = 0, fade = el > END - 1.5 ? Math.max(0, (END - el) / 1.5) : 1;
+    ctx.clearRect(0, 0, g.w, g.h);
+    parts.forEach(function(p){
+      if (p.gone) return;
+      if (el < p.delay) { alive++; return; }
+      p.vy += 900 * dt;
+      var drag = Math.pow(.3, dt); p.vx *= drag; p.vy *= p.vy > 0 ? Math.pow(.006, dt) : drag;   /* falling pieces drift down slowly */
+      p.ph += 2.2 * dt;
+      p.x += (p.vx + (p.vy > 0 ? Math.sin(p.ph) * p.sw : 0)) * dt; p.y += p.vy * dt; p.rot += p.vr * dt; p.fl += p.vf * dt;
+      if (p.y > g.h + 30) { p.gone = true; return; }
+      alive++;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, Math.cos(p.fl));
+      ctx.globalAlpha = fade; ctx.fillStyle = p.c;
+      if (p.r) { ctx.beginPath(); ctx.arc(0, 0, p.r, 0, 6.2832); ctx.fill(); } else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (alive && el < END) requestAnimationFrame(frame); else cv.remove();
+  }
+  requestAnimationFrame(frame);
 }
 
 /* ---------- shared bits ---------- */
@@ -1038,7 +1367,7 @@ function boardScrollTo(wrap, i, edge){
   else if (hr.right > wr.right - 10) wrap.scrollLeft += hr.right - (wr.right - 10);
 }
 var lastW = window.innerWidth;
-window.addEventListener('resize', function(){ if (window.innerWidth === lastW) return; lastW = window.innerWidth; if (S.view === 'board') { S.hmReset = true; scheduleRender(); } });
+window.addEventListener('resize', function(){ if (window.innerWidth === lastW) return; lastW = window.innerWidth; if (S.view === 'board' || S.view === 'recap') { S.hmReset = true; scheduleRender(); } });
 /* Small arrows at the board's edges when days are hidden on that side. */
 function updateBoardArrows(){
   var wrap = $app.querySelector('.hm-wrap'), box = wrap && wrap.parentNode; if (!box) return;
@@ -1070,8 +1399,9 @@ function boardGrid(ms, L, today, d){
         else if (i > today) { cls += ' future'; lab = 'upcoming'; }
         else { p = Math.round(s.done / s.total * 100); if (!s.done && i < today) cls += ' missed'; cls += p === 100 ? ' full' : p ? ' part' : ''; lab = s.done + ' of ' + s.total + ' done'; if (p) p = 25 + Math.round(p * .75); }
         if (s.late) { cls += ' late'; lab += ', ' + s.late + ' caught up the next day'; }
+        var md = i <= today ? medal(m, i) : 0; if (md) lab += ', ' + MEDAL[md] + ' star';
         if (i === today) cls += ' today'; if (i === d && d !== today) cls += ' sel';
-        g += '<button class="' + cls + '" style="--mc:' + mc(m) + ';--p:' + p + '%;grid-row:' + (r+2) + ';grid-column:' + (i+2) + '" data-act="goday" data-d="' + i + '" aria-label="' + esc(m.name + ', day ' + (i+1) + ': ' + lab) + '"></button>';
+        g += '<button class="' + cls + '" style="--mc:' + mc(m) + ';--p:' + p + '%;grid-row:' + (r+2) + ';grid-column:' + (i+2) + '" data-act="goday" data-d="' + i + '" aria-label="' + esc(m.name + ', day ' + (i+1) + ': ' + lab) + '">' + starHtml(md) + '</button>';
       }
     });
     html += g + '</div>';
@@ -1080,16 +1410,18 @@ function boardGrid(ms, L, today, d){
     '<div class="hm-box"><div class="hm-wrap">' + html + '</div>' +
     '<button class="hm-more l" data-act="hmstep" data-dir="-1" aria-label="Earlier days" hidden>' + IC.left + '</button>' +
     '<button class="hm-more r" data-act="hmstep" data-dir="1" aria-label="Later days" hidden>' + IC.right + '</button></div>' +
-    '<div class="legend"><span><i class="cell" style="--p:100%"></i>All done</span><span><i class="cell" style="--p:55%"></i>Some done</span><span><i class="cell late" style="--p:100%"></i>Caught up</span><span><i class="cell missed"></i>Missed</span><span><i class="cell rest"></i>Rest</span><span><i class="cell future"></i>Upcoming</span></div>';
+    '<div class="legend"><span><i class="cell" style="--p:100%"></i>All done</span><span><i class="cell" style="--p:55%"></i>Some done</span><span><i class="cell late" style="--p:100%"></i>Caught up</span><span><i class="cell missed"></i>Missed</span><span><i class="cell rest"></i>Rest</span><span><i class="cell future"></i>Upcoming</span>' +
+      (rules() >= 2 ? '<span>' + starHtml(1) + starHtml(2) + starHtml(3) + '1, 2 or 3 types done: strength, cardio, stretches</span>' : '') + '</div>';
 }
 function viewBoard(){
   var st = settings(), ms = members();
   if (!st || !ms.length) return viewSetup();
   var L = len(), today = dayIdx();
   var d = clamp(S.boardDay != null ? S.boardDay : today, 0, L-1);
-  var m0 = me();
+  var m0 = me(), fz = frozen();
   var out = modeBanner();
-  if (!m0 || S.showWho) out += whoPicker(m0 ? 'Switch to a different person on this device.' : 'Pick your name to log your workouts. Everyone can see the board.');
+  if (fz) out += '<div class="banner" style="margin-bottom:10px">This challenge is finished. <button class="linkbtn" data-act="nav" data-view="recap">See the recap and awards</button></div>';
+  if (!m0 || S.showWho) out += whoPicker(m0 ? 'Switch to a different person on this device.' : fz ? 'Pick your name to highlight yourself.' : 'Pick your name to log your workouts. Everyone can see the board.');
 
   var tot = 0, dn = 0, peopleDone = 0, peopleWith = 0;
   var stats = ms.map(function(m){ var s = dayStat(m, d); tot += s.total; dn += s.done; if (s.total){ peopleWith++; if (s.complete) peopleDone++; } return {m:m, s:s}; });
@@ -1117,20 +1449,21 @@ function viewBoard(){
   out += boardGrid(ms, L, today, d);
 
   var order = stats.slice().sort(function(a,b){ return (b.m.id === S.me) - (a.m.id === S.me); });
-  var hint = !m0 ? '' : d === today ? 'Tap your exercises to log them' : d === today - 1 ? 'Tap to catch up on what you missed' : d > today ? 'Upcoming' : 'Past days are locked';
+  var hint = !m0 ? '' : fz ? 'Final results' : d === today ? 'Tap your exercises to log them' : d === today - 1 ? 'Tap to catch up on what you missed' : d > today ? 'Upcoming' : 'Past days are locked';
   out += '<div class="sec-h"><h2>Lineup</h2><span>' + hint + '</span></div><div class="lineup">' +
     order.map(function(x){
       var m = x.m, s = x.s, mine = m.id === S.me;
       var score = s.rest ? 'Rest' : s.empty ? '–' : s.done + '/' + s.total;
-      var body = s.empty ? '<p class="empty-line">No plan for this day.' + (mine ? ' <button class="linkbtn" data-act="planday" data-d="' + d + '">Add exercises</button>' : '') + '</p>'
+      var body = s.empty ? '<p class="empty-line">No plan for this day.' + (mine && !fz ? ' <button class="linkbtn" data-act="planday" data-d="' + d + '">Add exercises</button>' : '') + '</p>'
         : '<div class="chips">' + s.items.map(function(it){ return chip(m, it, d, mine); }).join('') + '</div>';
-      if (mine && d === today) body += catchupBlock(m, today);
-      return '<article class="mcard' + (mine ? ' me' : '') + '" style="--mc:' + mc(m) + '"><div class="mhead"><span class="avatar">' + initial(m) + '</span><span class="mname">' + esc(m.name) + (mine ? ' <small>(you)</small>' : '') + '</span><span class="mscore' + (s.complete ? ' full' : '') + '">' + score + '</span></div>' + body + '</article>';
+      if (mine && d === today && !fz) body += catchupBlock(m, today);
+      var md = d <= today ? medal(m, d) : 0;
+      return '<article class="mcard' + (mine ? ' me' : '') + '" style="--mc:' + mc(m) + '"><div class="mhead"><span class="avatar">' + initial(m) + '</span><span class="mname">' + esc(m.name) + (mine ? ' <small>(you)</small>' : '') + '</span>' + starHtml(md, medalLabel(md)) + '<span class="mscore' + (s.complete ? ' full' : '') + '">' + score + '</span></div>' + body + '</article>';
     }).join('') + '</div>';
 
 
   var st2 = ms.map(function(m){ return {m:m, f:soFar(m), k:streak(memberOk(m))}; }).sort(function(a,b){ return (b.f.pct - a.f.pct) || (b.k - a.k) || (b.f.done - a.f.done); });
-  out += '<div class="sec-h"><h2>Standings</h2><span>Exercises done so far</span></div><div class="panel">' + st2.map(function(x, k){
+  out += '<div class="sec-h"><h2>Standings</h2><span>Exercises done so far · <button class="linkbtn" data-act="nav" data-view="leaders">All leaderboards</button></span></div><div class="panel">' + st2.map(function(x, k){
     return '<div class="srow" style="--mc:' + mc(x.m) + '"><span class="rank">' + (k+1) + '</span><span class="avatar">' + initial(x.m) + '</span><div style="min-width:0"><div class="mname">' + esc(x.m.name) + '</div><div class="bar" style="--w:' + x.f.pct + '%"><i></i></div></div><div class="num">' + x.f.pct + '%<small>' + x.k + '-day streak</small></div></div>';
   }).join('') + '</div>';
   return out;
@@ -1249,6 +1582,7 @@ function planCard(p){
     (p.desc ? '<p class="muscles">' + esc(p.desc) + '</p>' : '') +
     '<ul class="sessions">' + p.sessions.map(function(s, i){ return '<li><b>' + letter(i) + '</b><span>' + sessionLine(s) + '</span></li>'; }).join('') + '</ul>';
   var a = S.applying && S.applying.id === p.id ? S.applying : null;
+  if (frozen()) return out + '</article>';
   if (!a) {
     var dk = 'delplan-' + p.id;
     out += '<div class="btnrow"><button class="btn primary sm" data-act="useplan" data-id="' + esc(p.id) + '"' + (me() ? '' : ' disabled') + '>Use this plan</button>' +
@@ -1300,9 +1634,11 @@ function draftEditor(){
 }
 function viewPlans(){
   if (!settings()) return viewSetup();
-  var out = modeBanner() + '<h1 class="page-h">Plans</h1><p class="lead">Ready-made weeks anyone can use. Build one for the group, or start from someone\'s week and tweak it.</p>';
-  if (!me()) out += '<div style="margin-top:14px">' + whoPicker('Pick your name to apply a plan to your days.') + '</div>';
-  if (S.draft) out += draftEditor();
+  var fz = frozen();
+  var out = modeBanner() + '<h1 class="page-h">Plans</h1><p class="lead">' + (fz ? 'The plans the group shared during this challenge. Starting the next challenge (in Group) copies them over.' : 'Ready-made weeks anyone can use. Build one for the group, or start from someone\'s week and tweak it.') + '</p>';
+  if (!me() && !fz) out += '<div style="margin-top:14px">' + whoPicker('Pick your name to apply a plan to your days.') + '</div>';
+  if (fz) {}
+  else if (S.draft) out += draftEditor();
   else {
     var ms = members(), weeks = Math.ceil(len() / 7), wopts = '';
     var wsel = S.impWeek != null && S.impWeek < weeks ? S.impWeek : Math.floor(clamp(dayIdx(), 0, len()-1) / 7);
@@ -1332,25 +1668,26 @@ function exForm(e, id){
     (id && id !== 'rest' ? '<button class="btn danger' + (S.confirmKey === dk ? ' armed' : '') + '" type="button" data-act="delex" data-id="' + esc(id) + '" data-confirm=\"' + esc(dk) + '\">' + (S.confirmKey === dk ? 'Tap again to delete' : 'Delete') + '</button>' : '') + '</div></form>';
 }
 function viewExercises(){
-  var out = modeBanner() + '<h1 class="page-h">Exercises</h1><p class="lead">Shared by everyone. Change a level here and it updates in every plan that uses it.</p>';
+  var fz = frozen();
+  var out = modeBanner() + '<h1 class="page-h">Exercises</h1><p class="lead">' + (fz ? 'The exercises from this challenge. Starting the next challenge (in Group) copies them over.' : 'Shared by everyone. Change a level here and it updates in every plan that uses it.') + '</p>';
   out += '<div class="btnrow" style="margin:14px 0 10px;flex-wrap:nowrap"><div class="searchbox" style="flex:1">' + IC.search + '<input type="search" id="ex-search" placeholder="Search exercises or muscles" aria-label="Search exercises" value="' + esc(S.exQuery) + '" autocomplete="off"></div>' +
-    (S.editEx === '__new' ? '' : '<button class="btn primary" data-act="newex">Add</button>') + '</div>';
-  if (S.editEx === '__new') out += exForm({kind:'bodyweight'}, '');
+    (S.editEx === '__new' || fz ? '' : '<button class="btn primary" data-act="newex">Add</button>') + '</div>';
+  if (S.editEx === '__new' && !fz) out += exForm({kind:'bodyweight'}, '');
   var any = false;
   KINDS.forEach(function(k){
     var g = exList().filter(function(e){ return e.kind === k; });
     if (!g.length) return; any = true;
     out += '<section class="exsec" data-kind="' + k + '"><div class="sec-h"><h2>' + KIND_LABEL[k] + '</h2><span class="cnt">' + g.length + '</span></div><div class="exlist">' + g.map(function(e){
-      if (S.editEx === e.id) return exForm(e, e.id);
+      if (S.editEx === e.id && !fz) return exForm(e, e.id);
       var hay = (e.name + ' ' + (e.muscles || '') + ' ' + KIND_LABEL[k]).toLowerCase();
-      return '<article class="excard" data-search="' + esc(hay) + '"><div class="excard-h"><div style="min-width:0"><h3>' + esc(e.name) + '</h3>' + (e.muscles ? '<p class="muscles">' + esc(e.muscles) + '</p>' : '') + '</div><button class="btn sm" data-act="editex" data-id="' + esc(e.id) + '">Edit</button></div>' +
+      return '<article class="excard" data-search="' + esc(hay) + '"><div class="excard-h"><div style="min-width:0"><h3>' + esc(e.name) + '</h3>' + (e.muscles ? '<p class="muscles">' + esc(e.muscles) + '</p>' : '') + '</div>' + (fz ? '' : '<button class="btn sm" data-act="editex" data-id="' + esc(e.id) + '">Edit</button>') + '</div>' +
         (e.levels && e.levels.length ? '<ol class="lvls">' + e.levels.map(function(t, i){ return '<li>' + (e.levels.length > 1 ? '<b>L' + (i+1) + '</b>' : '') + '<span>' + esc(t) + '</span></li>'; }).join('') + '</ol>' : (e.kind === 'rest' ? '<p class="hint">A recovery day. It doesn\'t count against anyone.</p>' : '<p class="hint">No levels yet.</p>')) +
         refHtml(e) + '</article>';
     }).join('') + '</div></section>';
   });
   out += '<p class="empty-line" id="ex-none" hidden>No exercises match that search.</p>';
   if (!any && S.editEx !== '__new') out += '<p class="empty-line">No exercises yet.</p>';
-  out += '<p class="hint" style="margin-top:18px">Form links open StrengthLog, which shows each move with an animation, step-by-step form and the muscles it works. Stretches link to a video search.</p>';
+  out += '<p class="hint" style="margin-top:18px">Form links open StrengthLog, which shows each move with an animation, step-by-step form and the muscles it works. Cardio and stretches link to a video search.</p>';
   return out;
 }
 function applyExFilter(){
@@ -1368,9 +1705,225 @@ function applyExFilter(){
   var none = document.getElementById('ex-none'); if (none) none.hidden = !(words.length && !shown);
 }
 
+/* ---------- leaderboards ---------- */
+function fmtN(n){ try { return Number(n).toLocaleString(); } catch(e){ return String(n); } }
+function starsLine(r){ return starHtml(3) + ' ' + r.gold + ' &nbsp;' + starHtml(2) + ' ' + r.silver + ' &nbsp;' + starHtml(1) + ' ' + r.bronze; }
+var METRICS = [
+  {k:'overall', label:'Overall', desc:'Average place across all the other boards here. Lower is better.'},
+  {k:'exercises', label:'Exercises', desc:'Exercises checked off, catch-ups included.',
+    val:function(r){ return r.done; }, show:function(r){ return [fmtN(r.done), 'of ' + fmtN(r.total) + ' planned']; }},
+  {k:'workouts', label:'Workouts', desc:'Days with at least one exercise done.',
+    val:function(r){ return r.workouts; }, show:function(r){ return [r.workouts, 'of ' + r.days + ' day' + (r.days === 1 ? '' : 's')]; }},
+  {k:'full', label:'Full days', desc:'Days with every planned exercise done.',
+    val:function(r){ return r.full; }, show:function(r){ return [r.full, 'of ' + r.planned + ' planned']; }},
+  {k:'progress', label:'Progress', desc:'Share of planned exercises done, today included.',
+    val:function(r){ return r.ratio; }, show:function(r){ return [r.pct + '%', fmtN(r.done) + ' of ' + fmtN(r.total)]; }},
+  {k:'streak', label:'Streak', desc:function(){ return rules() >= 2 ? 'Days in a row with at least one exercise done. A day with nothing done, rest days included, starts it over. Today counts once you log something.' : 'Days in a row with every planned exercise done. Rest days are skipped.'; },
+    val:function(r){ return r.cur; }, show:function(r){ return [r.cur, 'best ' + r.best]; }},
+  {k:'best', label:'Best streak', desc:'The longest streak in these days.',
+    val:function(r){ return r.best; }, show:function(r){ return [r.best, r.cur ? 'now ' + r.cur : '']; }},
+  {k:'variety', label:'Variety', desc:'Different exercises done at least once.',
+    val:function(r){ return r.variety; }, show:function(r){ return [r.variety, 'exercise' + (r.variety === 1 ? '' : 's')]; }}
+];
+function lbLoad(){ try { var o = JSON.parse(LS.get('fw.lb') || '{}') || {}; return {m: o.m || 'overall', r: o.r || 'all'}; } catch(e){ return {m:'overall', r:'all'}; } }
+function lbSave(){ LS.set('fw.lb', JSON.stringify(S.lb)); }
+function lbRanges(){
+  var L = len(), t = dayIdx(), last = Math.min(t, L-1), fin = frozen() || t >= L;
+  var out = [{k:'all', label: fin ? 'Whole challenge' : 'So far', a:0, b:L-1}];
+  for (var w=0; w*7 <= last; w++) out.push({k:'w' + w, label:'Week ' + (w+1), a:w*7, b:Math.min(L-1, w*7 + 6)});
+  return out;
+}
+function lbVal(x, mt){ return mt.k === 'overall' ? -x.avg : mt.val(x.r); }
+function lbShow(x, mt, n, nb){ return mt.k === 'overall' ? [x.avg.toFixed(1), 'avg place' + (x.firsts ? ' · top in ' + x.firsts + ' of ' + nb : '')] : mt.show(x.r); }
+function stackOf(list){ return '<span class="stack">' + list.slice(0, 3).map(function(x){ return '<span class="avatar sm" style="--mc:' + mc(x.m) + '">' + initial(x.m) + '</span>'; }).join('') + '</span>'; }
+function namesOf(list){ var n = list.map(function(x){ return esc(x.m.name); }); return n.length <= 2 ? n.join(' &amp; ') : n[0] + ' +' + (n.length - 1); }
+function viewLeaders(){
+  var st = settings(), ms = members();
+  if (!st || !ms.length) return viewSetup();
+  var lb = S.lb || (S.lb = lbLoad());
+  var rgs = lbRanges(), rg = rgs.filter(function(x){ return x.k === lb.r; })[0] || rgs[0];
+  var mets = METRICS.filter(function(x){ return !(x.k === 'streak' && rg.k !== 'all'); });
+  var met = mets.filter(function(x){ return x.k === lb.m; })[0] || mets[0];
+  var rows = ms.map(function(m){ return {m:m, r:mstats(m, rg.a, rg.b)}; });
+  var scored = mets.filter(function(x){ return x.val; });
+  rows.forEach(function(x){ x.place = 0; x.firsts = 0; });
+  scored.forEach(function(mt){
+    var vs = rows.map(function(x){ return mt.val(x.r); });
+    ranks(vs).forEach(function(p, i){ rows[i].place += p; if (p === 1 && vs[i] > 0) rows[i].firsts++; });
+  });
+  rows.forEach(function(x){ x.avg = x.place / scored.length; });
+  var out = modeBanner() + '<h1 class="page-h">Leaderboards</h1><p class="lead">Who\'s ahead, measured a few different ways. Tap a board to see everyone\'s place.</p>';
+  out += '<div class="fchips" role="group" aria-label="Days counted" style="margin-top:14px">' + rgs.map(function(x){
+    return '<button class="fchip" data-act="lbr" data-k="' + x.k + '" aria-pressed="' + (x.k === rg.k) + '">' + esc(x.label) + '</button>';
+  }).join('') + '</div>';
+  if (!rows.some(function(x){ return x.r.done > 0; })) {
+    return out + '<p class="empty-line" style="margin-top:14px">' + (dayIdx() < 0 ? 'The challenge hasn\'t started yet.' : 'Nothing logged in these days yet.') + ' The boards fill in as people check in.</p>';
+  }
+  var sub = rg.k === 'all' ? (frozen() || dayIdx() >= len() ? 'Days 1–' + len() : 'Days 1–' + (Math.min(dayIdx(), len()-1) + 1)) : 'Days ' + (rg.a + 1) + '–' + (rg.b + 1);
+  out += '<div class="sec-h tight"><h2>Who\'s ahead</h2><span>' + esc(sub) + '</span></div><div class="panel">' + mets.map(function(mt){
+    var vs = rows.map(function(x){ return lbVal(x, mt); }), top = Math.max.apply(null, vs);
+    var lead = rows.filter(function(x, i){ return vs[i] === top; });
+    var none = mt.k !== 'overall' && top <= 0;
+    return '<button class="srow lbmini" data-act="lbm" data-k="' + mt.k + '" aria-pressed="' + (mt.k === met.k) + '"><span class="lbl">' + esc(mt.label) + '</span>' +
+      '<span class="who2">' + (none ? '<span class="hint">No one yet</span>' : stackOf(lead) + '<span class="nm">' + namesOf(lead) + '</span>') + '</span>' +
+      '<span class="num">' + (none ? '–' : lbShow(lead[0], mt, ms.length, scored.length)[0]) + '</span></button>';
+  }).join('') + '</div>';
+  var vs = rows.map(function(x){ return lbVal(x, met); }), rk = ranks(vs), max = Math.max.apply(null, vs), n = ms.length;
+  var order = rows.map(function(x, i){ return {x:x, p:rk[i], v:vs[i]}; }).sort(function(a, b){ return (a.p - b.p) || String(a.x.m.name).localeCompare(String(b.x.m.name)); });
+  out += '<div class="sec-h" id="lb-rank"><h2>' + esc(met.label) + '</h2><span>' + esc(sub) + '</span></div>' +
+    '<div class="fchips" role="group" aria-label="Board">' + mets.map(function(x){ return '<button class="fchip" data-act="lbm" data-k="' + x.k + '" aria-pressed="' + (x.k === met.k) + '">' + esc(x.label) + '</button>'; }).join('') + '</div>' +
+    '<p class="lbdesc">' + esc(typeof met.desc === 'function' ? met.desc() : met.desc) + '</p>';
+  out += '<div class="panel">' + order.map(function(o){
+    var x = o.x, sh = lbShow(x, met, n, scored.length), real = met.k === 'overall' || o.v > 0;
+    var w = met.k === 'overall' ? Math.round((n - x.avg + 1) / n * 100) : (max > 0 ? Math.round(o.v / max * 100) : 0);
+    return '<div class="srow lbrow' + (x.m.id === S.me ? ' me' : '') + '" style="--mc:' + mc(x.m) + '"><span class="rk' + (real && o.p <= 3 ? ' r' + o.p : '') + '">' + o.p + '</span><span class="avatar">' + initial(x.m) + '</span>' +
+      '<div style="min-width:0"><div class="mname">' + esc(x.m.name) + (x.m.id === S.me ? ' <small>(you)</small>' : '') + '</div><div class="bar" style="--w:' + clamp(w, 0, 100) + '%"><i></i></div></div>' +
+      '<div class="num">' + sh[0] + (sh[1] ? '<small>' + sh[1] + '</small>' : '') + '</div></div>';
+  }).join('') + '</div>';
+  if (rules() < 2 && !frozen()) out += '<p class="hint" style="margin-top:14px">The one-exercise streak is part of the newer rules, which new challenges use.</p>';
+  return out;
+}
+
+/* ---------- recap (a finished challenge) ----------
+   Awards are picked from the numbers: first each award goes to whoever leads it outright (if they don't have one yet),
+   then everyone left gets the award where they place best. Custom titles and texts (meta/recap, loaded from a file
+   in Group or edited here) replace the automatic ones. */
+var AW_ICON = {
+  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 6H5.5a2.5 2.5 0 0 0 2.6 4M16 6h2.5a2.5 2.5 0 0 1-2.6 4M12 13v4M8.5 20.5h7M9.5 17h5"/>',
+  flame:'<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.6 1 2.6 2 3 0-3 .5-5.5.5-8z"/>',
+  bolt:'<path d="M13 2.5 5 13.5h6l-1 8 8-11h-6l1-8z"/>',
+  check:'<circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.8 2.8L16.2 9.6"/>',
+  star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>',
+  compass:'<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  rewind:'<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5v4h4"/>',
+  up:'<path d="M4 17l6-6 4 4 6-7"/><path d="M15 8h5v5"/>',
+  sun:'<circle cx="12" cy="12" r="3.8"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
+  heart:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
+  medal:'<circle cx="12" cy="15" r="5.5"/><path d="M8.6 10.6 6 3h4l2 5 2-5h4l-2.6 7.6"/>'
+};
+function awIcon(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (AW_ICON[k] || AW_ICON.medal) + '</svg>'; }
+/* Check-in times, with the day starting at 4am so a 12:30am check-in counts as late, not early. */
+function checkinMinutes(m){
+  var out = [], L = len();
+  Object.keys(m.log || {}).forEach(function(k){
+    if (+k < 0 || +k >= L) return;
+    var day = m.log[k] || {};
+    Object.keys(day).forEach(function(id){ var e = day[id]; if (e && e.s === 'done' && e.t && !e.c) { var d = new Date(e.t); out.push((d.getHours() * 60 + d.getMinutes() + 1200) % 1440); } });
+  });
+  return out.sort(function(a, b){ return a - b; });
+}
+function hhmm(shifted){
+  var m = (shifted + 240) % 1440;
+  try { return new Date(2000, 0, 1, Math.floor(m / 60), m % 60).toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}); } catch(e){ return Math.floor(m / 60) + ':' + pad(m % 60); }
+}
+function awardRow(m){
+  var L = len(), r = mstats(m, 0, L-1);
+  r.improve = 0;
+  if (L >= 14) { var a = mstats(m, 0, 6), b = mstats(m, L-7, L-1); if (a.total && b.total) { r.w1 = a.pct; r.wl = b.pct; r.improve = b.pct - a.pct; } }
+  var mins = checkinMinutes(m); r.med = mins.length >= 8 ? mins[Math.floor(mins.length / 2)] : null;
+  return r;
+}
+var AWARDS = [
+  {k:'champ', title:'Champion', icon:'trophy', min:.01, val:function(r){ return r.ratio; }, line:function(r){ return r.pct + '% of everything planned, done'; }},
+  {k:'streak', title:'Iron Streak', icon:'flame', min:3, val:function(r){ return r.best; }, line:function(r){ return r.best + ' days in a row ' + (rules() >= 2 ? 'with at least one exercise done' : 'with every planned exercise done'); }},
+  {k:'work', title:'Workhorse', icon:'bolt', min:1, val:function(r){ return r.done; }, line:function(r){ return fmtN(r.done) + ' exercises checked off'; }},
+  {k:'perfect', title:'Perfect Days', icon:'check', min:2, val:function(r){ return r.full; }, line:function(r){ return r.full + ' days with every planned exercise done'; }},
+  {k:'stars', title:'Star Collector', icon:'star', min:3, v2:true, val:function(r){ return r.stars; }, line:function(r){ return r.gold + ' gold, ' + r.silver + ' silver and ' + r.bronze + ' bronze stars'; }},
+  {k:'explorer', title:'Explorer', icon:'compass', min:5, val:function(r){ return r.variety; }, line:function(r){ return r.variety + ' different exercises done'; }},
+  {k:'comeback', title:'Comeback Kid', icon:'rewind', min:2, val:function(r){ return r.late; }, line:function(r){ return r.late + ' exercises caught up the day after'; }},
+  {k:'improved', title:'Most Improved', icon:'up', min:10, plain:true, val:function(r){ return r.improve; }, line:function(r){ return 'From ' + r.w1 + '% of the plan in week 1 to ' + r.wl + '% in the last week.'; }},
+  {k:'early', title:'Early Bird', icon:'sun', plain:true, ok:function(r){ return r.med != null && r.med <= 360; }, val:function(r){ return r.med == null ? -1 : 1440 - r.med; }, line:function(r){ return 'Half of all check-ins were in by ' + hhmm(r.med) + '.'; }},
+  {k:'owl', title:'Night Owl', icon:'moon', plain:true, ok:function(r){ return r.med != null && r.med >= 960; }, val:function(r){ return r.med == null ? -1 : r.med; }, line:function(r){ return 'Half of all check-ins came in after ' + hhmm(r.med) + '.'; }}
+];
+var AW_STEADY = {k:'steady', title:'Showed Up', icon:'calendar', plain:true, line:function(r){ return 'Trained on ' + r.workouts + ' of ' + r.days + ' days.'; }};
+function autoAwards(rows){
+  var list = AWARDS.filter(function(a){ return !a.v2 || rules() >= 2; }), out = {}, used = {};
+  function ok(a, x){ return a.ok ? a.ok(x.r) : a.val(x.r) >= (a.min || 1); }
+  function place(a, x){ var v = a.val(x.r); return 1 + rows.filter(function(y){ return ok(a, y) && a.val(y.r) > v; }).length; }
+  list.forEach(function(a){
+    var c = rows.filter(function(x){ return ok(a, x); }); if (!c.length) return;
+    var top = Math.max.apply(null, c.map(function(x){ return a.val(x.r); }));
+    var pick = c.filter(function(x){ return a.val(x.r) === top && !out[x.m.id]; })[0];
+    if (pick) { out[pick.m.id] = a; used[a.k] = 1; }
+  });
+  rows.slice().sort(function(a, b){ return b.r.ratio - a.r.ratio; }).forEach(function(x){
+    if (out[x.m.id]) return;
+    var best = null, bp = 1e9;
+    list.forEach(function(a){ if (used[a.k] || !ok(a, x)) return; var p = place(a, x); if (p < bp) { bp = p; best = a; } });
+    out[x.m.id] = best || AW_STEADY; if (best) used[best.k] = 1;
+  });
+  var res = {};
+  rows.forEach(function(x){
+    var a = out[x.m.id], text = a.line(x.r);
+    if (!a.plain) {
+      var v = a.val(x.r), ties = rows.filter(function(y){ return a.val(y.r) === v; }).length, first = !rows.some(function(y){ return a.val(y.r) > v; });
+      text += first ? (ties > 1 ? ', joint top of the group.' : ', top of the group.') : '.';
+    }
+    res[x.m.id] = {k:a.k, title:a.title, icon:a.icon, blurb:text};
+  });
+  return res;
+}
+function recapDoc(){ var d = S.data.meta.recap; return d && typeof d === 'object' ? d : {}; }
+function linkFor(code){ return location.origin + location.pathname + '#k=' + code; }
+function nextOf(st){ var nx = st && st.next; return nx && GK_RE.test(nx.code || '') ? nx : null; }
+function prevOf(st){ var pv = st && st.prev; return pv && GK_RE.test(pv.code || '') ? pv : null; }
+function awardCard(x, aw, place){
+  var m = x.m, r = x.r, cu = (recapDoc().awards || {})[m.id], custom = !!(cu && (cu.title || cu.blurb));
+  var title = custom && cu.title ? cu.title : aw.title, blurb = custom && cu.blurb ? cu.blurb : aw.blurb, icon = custom ? (cu.icon || (cu.title ? 'medal' : aw.icon)) : aw.icon;
+  var out = '<article class="award" style="--mc:' + mc(m) + '"><div class="aw-who"><span class="avatar">' + initial(m) + '</span><div style="min-width:0"><div class="mname">' + esc(m.name) + (m.id === S.me ? ' <small>(you)</small>' : '') + '</div><div class="hint">' + r.pct + '% done</div></div><span class="ribbon">' + awIcon(icon) + '</span></div>';
+  if (S.editAward === m.id) {
+    return out + '<form data-form="award" data-id="' + esc(m.id) + '" data-keep="aw-' + esc(m.id) + '" style="display:grid;gap:10px">' +
+      '<div class="field"><label for="aw-t-' + esc(m.id) + '">Award</label><input id="aw-t-' + esc(m.id) + '" name="title" type="text" maxlength="60" value="' + esc(title) + '"></div>' +
+      '<div class="field"><label for="aw-b-' + esc(m.id) + '">What it\'s for</label><textarea id="aw-b-' + esc(m.id) + '" name="blurb" maxlength="600">' + esc(blurb) + '</textarea></div>' +
+      '<div class="btnrow"><button class="btn primary sm" type="submit">Save</button><button class="btn sm" type="button" data-act="cancelaward">Cancel</button>' +
+      (custom ? '<button class="btn sm" type="button" data-act="autoaward" data-id="' + esc(m.id) + '">Use the automatic one</button>' : '') + '</div></form></article>';
+  }
+  out += '<div class="ttl">' + esc(title) + '</div><p class="blurb">' + esc(blurb) + '</p>' +
+    '<div class="mini"><span>' + fmtN(r.done) + ' exercises</span><span>' + r.full + ' full day' + (r.full === 1 ? '' : 's') + '</span><span>' + r.best + '-day best streak</span>' + (rules() >= 2 && r.stars ? '<span>' + r.stars + ' star points</span>' : '') + '</div>' +
+    (S.readOnly ? '' : '<div><button class="linkbtn" data-act="editaward" data-id="' + esc(m.id) + '" style="font-size:.8rem">Edit</button></div>');
+  return out + '</article>';
+}
+function viewRecap(){
+  var st = settings(), ms = members();
+  if (!st || !ms.length) return viewSetup();
+  var L = len(), today = dayIdx(), rd = recapDoc();
+  var rows = ms.map(function(m){ return {m:m, r:awardRow(m)}; });
+  rows.sort(function(a, b){ return (b.r.ratio - a.r.ratio) || (b.r.done - a.r.done); });
+  var pr = ranks(rows.map(function(x){ return x.r.ratio; }));
+  var aw = autoAwards(rows);
+  var team = {done:0, total:0}; rows.forEach(function(x){ team.done += x.r.done; team.total += x.r.total; });
+  var workouts = 0, top = null;
+  rows.forEach(function(x){ workouts += x.r.workouts; if (!top || x.r.best > top.r.best) top = x; });
+  var tops = rows.filter(function(x){ return x.r.best === top.r.best; });
+  var nx = nextOf(st), out = modeBanner();
+  if (nx) out += '<div class="banner" style="margin-bottom:10px"><b>' + esc(nx.title || 'The next challenge') + '</b> has started. <a class="linkbtn" href="#k=' + esc(nx.code) + '">Open it</a></div>';
+  out += '<section class="recap-hero" aria-label="Challenge recap"><div class="eyebrow">Challenge complete</div>' +
+    '<h1 class="recap-title">' + esc(st.title || 'Friends Workout') + '</h1>' +
+    '<div class="dateline"><b>' + L + ' days</b> · ' + esc(fmt(0, {day:'numeric', month:'short'})) + ' – ' + esc(fmt(L-1, {day:'numeric', month:'short', year:'numeric'})) + ' · ' + ms.length + ' people</div>' +
+    (rd.note ? '<p class="lead" style="white-space:pre-line">' + esc(rd.note) + '</p>' : '') +
+    '<div class="recap-stats">' +
+      '<div class="stat"><b>' + fmtN(team.done) + '</b><span>exercises done</span></div>' +
+      '<div class="stat"><b>' + (team.total ? Math.floor(team.done / team.total * 100) : 0) + '%</b><span>of the plan done</span></div>' +
+      '<div class="stat"><b>' + fmtN(workouts) + '</b><span>workouts logged</span></div>' +
+      '<div class="stat"><b>' + top.r.best + ' days</b><span>longest streak' + (top.r.best ? ' · ' + tops.map(function(x){ return esc(x.m.name); }).join(' &amp; ') : '') + '</span></div>' +
+    '</div><div class="btnrow"><button class="btn sm" data-act="confetti">Celebrate</button></div></section>';
+  out += '<div class="sec-h"><h2>Awards</h2><span>One for everyone</span></div><div class="awards">' +
+    rows.map(function(x, k){ return awardCard(x, aw[x.m.id], pr[k]); }).join('') + '</div>';
+  out += '<div class="sec-h"><h2>Final standings</h2><span><button class="linkbtn" data-act="nav" data-view="leaders">More leaderboards</button></span></div><div class="panel">' + rows.map(function(x, k){
+    return '<div class="srow lbrow' + (x.m.id === S.me ? ' me' : '') + '" style="--mc:' + mc(x.m) + '"><span class="rk' + (pr[k] <= 3 ? ' r' + pr[k] : '') + '">' + pr[k] + '</span><span class="avatar">' + initial(x.m) + '</span><div style="min-width:0"><div class="mname">' + esc(x.m.name) + '</div><div class="bar" style="--w:' + x.r.pct + '%"><i></i></div></div><div class="num">' + x.r.pct + '%<small>' + x.r.best + '-day best streak</small></div></div>';
+  }).join('') + '</div>';
+  out += boardGrid(ms, L, today, -1);
+  out += '<p class="hint" style="margin-top:16px">This challenge is finished, so nothing here changes any more. ' + (nx ? '' : 'Start the next one in <button class="linkbtn" data-act="nav" data-view="group">Group</button>.') + '</p>';
+  return out;
+}
+
 /* ---------- group ---------- */
 function backupCard(){
   if (!S.store || !S.store.listOnce) return '';
+  if (frozen()) return '<section class="card" style="margin-top:14px" aria-label="Backups"><div><h2 class="sm">Backups</h2><p class="lead" style="margin-top:4px">A finished challenge doesn\'t change, so no new backups are made. Keep a copy of everything on this device:</p></div>' +
+    '<div class="btnrow">' + (S.mode !== 'claude' ? '<button class="btn sm" data-act="downloadbk">Download a copy</button>' : '') + '</div></section>';
   if (S.bk.status === 'idle') setTimeout(loadBackups, 0);
   var b = S.bk, out = '<section class="card" style="margin-top:14px" aria-label="Backups"><div><h2 class="sm">Backups</h2><p class="lead" style="margin-top:4px">The first time anyone opens the app each day, a copy of the whole board is saved: people, plans, check-ins, exercises and shared plans. The last ' + BK_KEEP + ' days are kept.</p></div>';
   var pr = S.pendingRestore;
@@ -1412,39 +1965,122 @@ function shiftConfirm(){
     ' The challenge will run for ' + ps.length + ' days, ending ' + esc(fmt(endIdx, {weekday:'short', day:'numeric', month:'short'})) + '.</p>' +
     '<div class="btnrow" style="margin-top:10px"><button type="button" class="btn primary" data-act="confirmshift">Move the first day</button><button type="button" class="btn" data-act="cancelshift">Cancel</button></div></div>';
 }
+function lookCard(){
+  var sk = skin(), lv = LS.get('fw.leaves') !== 'off';
+  return '<section class="card" style="margin-top:14px" aria-label="Look"><div><h2 class="sm">Look</h2><p class="lead" style="margin-top:4px">The theme is shared: everyone in this challenge sees the same one.</p></div>' +
+    '<div class="field"><label for="g-skin">Theme</label><select id="g-skin" data-chg="setskin"' + (S.readOnly ? ' disabled' : '') + '><option value="classic"' + (sk === 'classic' ? ' selected' : '') + '>Classic</option><option value="fall"' + (sk === 'fall' ? ' selected' : '') + '>Fall</option></select></div>' +
+    (sk === 'fall' ? '<label class="check"><input type="checkbox" id="g-leaves" data-chg="setleaves"' + (lv ? ' checked' : '') + '>Falling leaves on this device</label>' : '') + '</section>';
+}
+function finishCard(){
+  var st = settings(), L = len(), left = L - 1 - Math.max(dayIdx(), -1), k = 'finish';
+  return '<section class="card" style="margin-top:14px" aria-label="Finish the challenge"><div><h2 class="sm">Finish the challenge</h2><p class="lead" style="margin-top:4px">Turns this link into a read-only recap: final stats, standings and an award for everyone, with confetti each time it\'s opened. Nobody can check in or change plans after that. You can reopen it here.</p></div>' +
+    (left > 0 ? '<p class="hint">' + left + ' day' + (left === 1 ? ' is' : 's are') + ' still to go.</p>' : '') +
+    '<div class="btnrow"><button class="btn' + (S.confirmKey === k ? ' armed' : '') + '" data-act="finish" data-confirm="' + k + '"' + (S.readOnly ? ' disabled' : '') + '>' + (S.confirmKey === k ? 'Tap again to finish it' : 'Finish the challenge') + '</button></div></section>';
+}
+function finishedCard(){
+  var st = settings(), k = 'reopen', when = '';
+  try { when = st.completedAt ? new Date(st.completedAt).toLocaleDateString(undefined, {day:'numeric', month:'long'}) : ''; } catch(e){}
+  return '<section class="card" style="margin-top:14px" aria-label="Finished"><div><h2 class="sm">This challenge is finished</h2><p class="lead" style="margin-top:4px">' + (when ? 'Marked finished on ' + esc(when) + '. ' : '') + 'The board, plans and exercises are read-only and this link opens on the recap. Reopening brings check-ins and editing back for everyone.</p></div>' +
+    '<div class="btnrow"><button class="btn sm' + (S.confirmKey === k ? ' armed' : '') + '" data-act="reopen" data-confirm="' + k + '"' + (S.readOnly ? ' disabled' : '') + '>' + (S.confirmKey === k ? 'Tap again to reopen' : 'Reopen the challenge') + '</button></div></section>';
+}
+function nextTitle(t){ t = String(t || 'Friends Workout').trim(); var m = t.match(/^(.*?)(\d+)$/); return m ? m[1] + (+m[2] + 1) : t + ' 2'; }
+function nextCard(){
+  var st = settings(), nx = nextOf(st), busy = S.nextBusy;
+  var out = '<section class="card" style="margin-top:14px" aria-label="Next challenge"><div><h2 class="sm">' + (nx && !S.showNextForm ? 'Next challenge' : 'Start the next challenge') + '</h2>';
+  if (nx && !S.showNextForm) {
+    return out + '<p class="lead" style="margin-top:4px">' + esc(nx.title || 'The next challenge') + ' has its own link. Send it to everyone; this one stays as the recap.</p></div>' +
+      '<div class="btnrow" style="flex-wrap:nowrap"><input type="text" id="next-link" readonly value="' + esc(linkFor(nx.code)) + '" aria-label="Next challenge link" style="flex:1"><button class="btn" data-act="copylink" data-target="next-link">Copy</button></div>' +
+      '<div class="btnrow"><a class="btn primary" href="#k=' + esc(nx.code) + '">Open ' + esc(nx.title || 'it') + '</a><button class="linkbtn" data-act="shownext">Start a different one</button></div></section>';
+  }
+  out += '<p class="lead" style="margin-top:4px">Makes a new link with the same people and colors, exercises and shared plans. Everyone starts with an empty plan and no check-ins, and it uses the Fall theme and the new streak and star rules. This challenge stays as it is, at this link.</p></div>';
+  if (S.mode !== 'firebase') return out + '<p class="hint">Only available on the shared board.</p></section>';
+  return out + '<form data-form="nextch" data-keep="nextch" style="display:grid;gap:14px">' +
+    '<div class="field"><label for="nx-title">Name</label><input id="nx-title" name="title" type="text" value="' + esc(nextTitle(st.title)) + '" required></div>' +
+    '<div class="grid2"><div class="field"><label for="nx-start">First day</label><input id="nx-start" name="start" type="date" value="' + esc(todayStr()) + '" required></div>' +
+    '<div class="field"><label for="nx-len">Length in days</label><input id="nx-len" name="length" type="number" min="1" max="366" value="' + esc(len()) + '" required></div></div>' +
+    '<div class="btnrow"><button class="btn primary" type="submit"' + (busy || S.readOnly ? ' disabled' : '') + '>' + (busy ? 'Copying… ' + busy.done + (busy.total ? ' of ' + busy.total : '') : 'Create the new challenge') + '</button>' +
+    (nx ? '<button class="btn" type="button" data-act="hidenext">Cancel</button>' : '') + '</div></form></section>';
+}
+function prevCard(){
+  var pv = prevOf(settings()); if (!pv) return '';
+  return '<section class="card" style="margin-top:14px" aria-label="Previous challenge"><div><h2 class="sm">Previous challenge</h2><p class="lead" style="margin-top:4px">' + esc(pv.title || 'The last challenge') + ': its recap, awards and final board.</p></div><div class="btnrow"><a class="btn" href="#k=' + esc(pv.code) + '">See the recap</a></div></section>';
+}
+function awardTextsCard(){
+  var n = Object.keys(recapDoc().awards || {}).length, k = 'clearaw';
+  return '<section class="card" style="margin-top:14px" aria-label="Award texts"><div><h2 class="sm">Award texts</h2><p class="lead" style="margin-top:4px">' + (n ? n + ' of the awards use custom texts.' : 'The awards are picked automatically from the numbers.') + ' Load custom titles and texts from a file, or tap Edit on an award in the recap.</p></div>' +
+    '<div class="btnrow"><label class="btn sm" for="recap-file">Load from a file</label>' +
+    (n ? '<button class="btn sm danger' + (S.confirmKey === k ? ' armed' : '') + '" data-act="clearawards" data-confirm="' + k + '">' + (S.confirmKey === k ? 'Tap again to reset' : 'Back to automatic') + '</button>' : '') + '</div></section>';
+}
 function viewGroup(){
-  var st = settings(), ms = members();
+  var st = settings(), ms = members(), fz = frozen();
   if (!st) return viewSetup();
   var out = modeBanner() + '<h1 class="page-h">Group</h1>';
-  out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">Who\'s using this device?</h2><p class="lead" style="margin-top:4px">Pick yourself. You can log and edit your own plan; everyone sees everything.</p></div><div class="who">' +
+  out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">Who\'s using this device?</h2><p class="lead" style="margin-top:4px">' + (fz ? 'Pick yourself to be highlighted on the boards.' : 'Pick yourself. You can log and edit your own plan; everyone sees everything.') + '</p></div><div class="who">' +
     ms.map(function(m){ return '<button data-act="iam" data-id="' + esc(m.id) + '" aria-pressed="' + (S.me === m.id) + '" style="--mc:' + mc(m) + '"><span class="avatar sm">' + initial(m) + '</span>' + esc(m.name) + '</button>'; }).join('') +
     '</div>' + (S.me ? '<div><button class="linkbtn" data-act="logout">Sign out on this device</button></div>' : '') + '</section>';
-  out += '<form class="card" data-form="settings" data-keep="settings" style="margin-top:14px"><h2 class="sm">Challenge</h2>' +
-    '<div class="field"><label for="g-title">Name</label><input id="g-title" name="title" type="text" value="' + esc(st.title || '') + '" required></div>' +
-    '<div class="grid2"><div class="field"><label for="g-start">First day</label><input id="g-start" name="start" type="date" value="' + esc(st.startDate || todayStr()) + '" required></div>' +
-    '<div class="field"><label for="g-len">Length in days</label><input id="g-len" name="length" type="number" min="1" max="366" value="' + esc(len()) + '" required></div></div>' +
-    shiftConfirm() +
-    '<div class="btnrow"' + (S.pendingShift ? ' hidden' : '') + '><button class="btn primary" type="submit">Save challenge</button></div></form>';
-  var taken = ms.map(function(m){ return (m.color || 0) % NCOL; });
-  out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">People</h2><p class="lead" style="margin-top:4px">Tap a color to change it. Rename by editing the name.</p></div>' + ms.map(function(m){
-    var rk = 'rmm-' + m.id, cur = (m.color || 0) % NCOL, pal = '';
-    if (S.colorFor === m.id) {
-      pal = '<div class="palette" role="group" aria-label="Colors for ' + esc(m.name) + '">';
-      for (var c=0;c<NCOL;c++) pal += '<button style="--mc:var(--m' + c + ')" class="' + (c !== cur && taken.indexOf(c) >= 0 ? 'taken' : '') + '" aria-pressed="' + (c === cur) + '" data-act="setcolor" data-id="' + esc(m.id) + '" data-c="' + c + '" aria-label="Color ' + (c+1) + (c !== cur && taken.indexOf(c) >= 0 ? ', used by someone else' : '') + '"></button>';
-      pal += '</div>';
-    }
-    return '<div><div class="mrow" style="--mc:' + mc(m) + '"><button class="swatch" data-act="color" data-id="' + esc(m.id) + '" aria-expanded="' + (S.colorFor === m.id) + '" aria-label="Change ' + esc(m.name) + '\'s color"></button>' +
-      '<input type="text" id="mn-' + esc(m.id) + '" aria-label="Name" value="' + esc(m.name) + '" data-chg="rename" data-id="' + esc(m.id) + '">' +
-      '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmmember" data-id="' + esc(m.id) + '" data-confirm=\"' + esc(rk) + '\" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove ' : 'Remove ') + esc(m.name) + '" title="Remove">' + IC.trash + '</button></div>' + pal + '</div>';
-  }).join('') +
-    '<form data-form="addmember" class="btnrow" style="flex-wrap:nowrap"><input type="text" id="g-newname" name="name" placeholder="Add a person" aria-label="New person\'s name" required style="flex:1"><button class="btn" type="submit">Add</button></form></section>';
-  out += shareCard();
-  out += backupCard();
+  if (fz) {
+    out += finishedCard() + nextCard() + awardTextsCard() + lookCard() + shareCard() + backupCard();
+  } else {
+    out += '<form class="card" data-form="settings" data-keep="settings" style="margin-top:14px"><h2 class="sm">Challenge</h2>' +
+      '<div class="field"><label for="g-title">Name</label><input id="g-title" name="title" type="text" value="' + esc(st.title || '') + '" required></div>' +
+      '<div class="grid2"><div class="field"><label for="g-start">First day</label><input id="g-start" name="start" type="date" value="' + esc(st.startDate || todayStr()) + '" required></div>' +
+      '<div class="field"><label for="g-len">Length in days</label><input id="g-len" name="length" type="number" min="1" max="366" value="' + esc(len()) + '" required></div></div>' +
+      shiftConfirm() +
+      '<div class="btnrow"' + (S.pendingShift ? ' hidden' : '') + '><button class="btn primary" type="submit">Save challenge</button></div></form>';
+    var taken = ms.map(function(m){ return (m.color || 0) % NCOL; });
+    out += '<section class="card" style="margin-top:14px"><div><h2 class="sm">People</h2><p class="lead" style="margin-top:4px">Tap a color to change it. Rename by editing the name.</p></div>' + ms.map(function(m){
+      var rk = 'rmm-' + m.id, cur = (m.color || 0) % NCOL, pal = '';
+      if (S.colorFor === m.id) {
+        pal = '<div class="palette" role="group" aria-label="Colors for ' + esc(m.name) + '">';
+        for (var c=0;c<NCOL;c++) pal += '<button style="--mc:var(--m' + c + ')" class="' + (c !== cur && taken.indexOf(c) >= 0 ? 'taken' : '') + '" aria-pressed="' + (c === cur) + '" data-act="setcolor" data-id="' + esc(m.id) + '" data-c="' + c + '" aria-label="Color ' + (c+1) + (c !== cur && taken.indexOf(c) >= 0 ? ', used by someone else' : '') + '"></button>';
+        pal += '</div>';
+      }
+      return '<div><div class="mrow" style="--mc:' + mc(m) + '"><button class="swatch" data-act="color" data-id="' + esc(m.id) + '" aria-expanded="' + (S.colorFor === m.id) + '" aria-label="Change ' + esc(m.name) + '\'s color"></button>' +
+        '<input type="text" id="mn-' + esc(m.id) + '" aria-label="Name" value="' + esc(m.name) + '" data-chg="rename" data-id="' + esc(m.id) + '">' +
+        '<button class="rmbtn' + (S.confirmKey === rk ? ' armed' : '') + '" data-act="rmmember" data-id="' + esc(m.id) + '" data-confirm=\"' + esc(rk) + '\" aria-label="' + (S.confirmKey === rk ? 'Tap again to remove ' : 'Remove ') + esc(m.name) + '" title="Remove">' + IC.trash + '</button></div>' + pal + '</div>';
+    }).join('') +
+      '<form data-form="addmember" class="btnrow" style="flex-wrap:nowrap"><input type="text" id="g-newname" name="name" placeholder="Add a person" aria-label="New person\'s name" required style="flex:1"><button class="btn" type="submit">Add</button></form></section>';
+    out += lookCard() + prevCard() + shareCard() + backupCard() + finishCard() + nextCard();
+  }
   var where = S.mode === 'claude' ? 'Saved in this shared Claude page. Everyone with edit access sees changes live.'
-    : S.mode === 'firebase' ? 'Saved to the Firebase project <span class="mono">' + esc(CONFIG.firebaseProject) + '</span>. Other people\'s check-ins appear within about 15 seconds, or right away when you come back to the tab.'
+    : S.mode === 'firebase' ? 'Saved to the Firebase project <span class="mono">' + esc(CONFIG.firebaseProject) + '</span>.' + (fz ? '' : ' Other people\'s check-ins appear within about 15 seconds, or right away when you come back to the tab.')
     : 'Saved in this browser only (demo mode).';
   out += '<p class="hint" style="margin-top:16px">' + where + '</p>';
   return out;
+}
+
+/* ---------- next challenge: copy people, exercises and shared plans into a new group ---------- */
+function fsPut(code, col, id, data){
+  var url = 'https://firestore.googleapis.com/v1/projects/' + encodeURIComponent(CONFIG.firebaseProject) + '/databases/(default)/documents/groups/' + code + '/' + col + '/' + encodeURIComponent(id) + (CONFIG.firebaseApiKey ? '?key=' + encodeURIComponent(CONFIG.firebaseApiKey) : '');
+  return fetch(url, {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields:{json:{stringValue: JSON.stringify(data)}}})})
+    .then(function(r){ if (!r.ok) throw {code: r.status === 429 ? 'rate_limited' : 'http', message:'HTTP ' + r.status}; });
+}
+function runPool(tasks, n){
+  var i = 0;
+  function worker(){ if (i >= tasks.length) return Promise.resolve(); var t = tasks[i++]; return t().then(worker); }
+  var ws = []; for (var k=0; k<Math.min(n, tasks.length); k++) ws.push(worker());
+  return Promise.all(ws);
+}
+function startNext(title, start, L2){
+  var code = newGroupKey(), oldCode = groupKey(), oldTitle = (settings() && settings().title) || 'Friends Workout';
+  S.nextBusy = {done:0, total:0}; render();
+  return Promise.all([S.store.listOnce('members'), S.store.listOnce('exercises'), S.store.listOnce('meta')]).then(function(res){
+    var writes = [], now = Date.now();
+    res[0].forEach(function(d){ var m = d.data || {}; if (!m.name) return; writes.push(['members', d.id, {name:m.name, color:m.color || 0, order:m.order || 0, plan:[], log:{}, base:start, updatedAt:now}]); });
+    res[1].forEach(function(d){ if (d.data) writes.push(['exercises', d.id, d.data]); });
+    res[2].forEach(function(d){ if (d.id.indexOf('plan-') === 0 && d.data && d.data.sessions) writes.push(['meta', d.id, d.data]); });
+    S.nextBusy.total = writes.length + 1; scheduleRender();
+    function put(w){ return function(){ return fsPut(code, w[0], w[1], w[2]).then(function(){ S.nextBusy.done++; scheduleRender(); }); }; }
+    /* Settings go last: until they exist the new link shows the setup screen, so a half-finished copy is never mistaken for a ready one. */
+    return runPool(writes.map(put), 4).then(put(['meta', 'settings', {title:title, startDate:start, length:L2, theme:'fall', rules:2, prev:{code:oldCode, title:oldTitle}, updatedAt:now}]));
+  }).then(function(){
+    S.nextBusy = null; S.showNextForm = false; S.noKeep = 'nextch';
+    patch('meta', 'settings', {next:{code:code, title:title}});
+    toast(title + ' is ready. Send everyone the new link.');
+  }, function(e){
+    S.nextBusy = null; render();
+    toast(e && e.code === 'rate_limited' ? 'The database\'s daily limit is used up. Try again tomorrow.' : 'Couldn\'t create the new challenge. Check the connection and try again.');
+  });
 }
 
 /* ---------- actions ---------- */
@@ -1466,7 +2102,24 @@ var A = {
   logout: function(){ S.me = null; LS.set('fw.me', null); render(); },
   day: function(b){ S.boardDay = clamp(+b.dataset.d, 0, len()-1); render(); },
   today: function(){ S.boardDay = null; render(); },
-  goday: function(b){ S.boardDay = +b.dataset.d; render(); },
+  goday: function(b){ S.boardDay = +b.dataset.d; if (S.view !== 'board') setView('board'); else render(); },
+  confetti: function(){ celebrate(); },
+  lbm: function(b){
+    S.lb = S.lb || lbLoad(); S.lb.m = b.dataset.k; lbSave(); render();
+    if (b.classList.contains('lbmini')) { var t = document.getElementById('lb-rank'); if (t && t.scrollIntoView) t.scrollIntoView({block:'start', behavior: calm() ? 'auto' : 'smooth'}); }
+  },
+  lbr: function(b){ S.lb = S.lb || lbLoad(); S.lb.r = b.dataset.k; lbSave(); render(); },
+  finish: function(){ patch('meta', 'settings', {completed:true, completedAt:Date.now()}); window.scrollTo(0, 0); },
+  reopen: function(){ patch('meta', 'settings', {completed:false}); toast('Reopened. Check-ins and editing are back on.'); },
+  shownext: function(){ S.showNextForm = true; render(); },
+  hidenext: function(){ S.showNextForm = false; S.noKeep = 'nextch'; render(); },
+  editaward: function(b){ S.editAward = b.dataset.id; render(); },
+  cancelaward: function(){ var id = S.editAward; S.editAward = null; S.noKeep = 'aw-' + id; render(); },
+  autoaward: function(b){
+    var id = b.dataset.id; S.editAward = null; S.noKeep = 'aw-' + id;
+    mutate('meta', 'recap', function(doc){ if (!doc || !doc.awards || !doc.awards[id]) return undefined; delete doc.awards[id]; return doc; });
+  },
+  clearawards: function(){ mutate('meta', 'recap', function(doc){ if (!doc) return undefined; doc.awards = {}; return doc; }); toast('Awards are automatic again'); },
   hmstep: function(b){ boardStep(+b.dataset.dir); },
   planday: function(b){ S.planDay = +b.dataset.d; setView('plan'); },
   pday: function(b){ S.planDay = +b.dataset.d; render(); },
@@ -1630,10 +2283,10 @@ var A = {
     } catch(e){ toast("Couldn't create the file on this device."); }
   },
   newgroup: function(){ setGroupKey(newGroupKey()); startFirebase(); setView('board'); toast('Group created. Send everyone the invite link.'); },
-  copylink: function(){
-    var el = document.getElementById('share-link'); if (!el) return;
+  copylink: function(b){
+    var el = document.getElementById((b && b.dataset.target) || 'share-link'); if (!el) return;
     function fallback(){ el.focus(); el.select(); toast('Link selected. Copy it from here.'); }
-    try { navigator.clipboard.writeText(el.value).then(function(){ toast('Invite link copied'); }, fallback); } catch(e){ fallback(); }
+    try { navigator.clipboard.writeText(el.value).then(function(){ toast('Link copied'); }, fallback); } catch(e){ fallback(); }
   },
   leavegroup: function(){ groupKeyMem = null; LS.set('fw.group', null); LS.set('fw.me', null); try { history.replaceState(null, '', location.pathname); } catch(e){} location.reload(); }
 };
@@ -1652,6 +2305,31 @@ var C = {
   },
   apstart: function(el){ if (S.applying) { S.applying.start = +el.value; render(); } },
   copysel: function(el){ S.copyFrom = el.value; },
+  setskin: function(el){ var v = el.value === 'fall' ? 'fall' : 'classic'; if (v !== skin()) patch('meta', 'settings', {theme: v}); },
+  setleaves: function(el){ LS.set('fw.leaves', el.checked ? null : 'off'); render(); },
+  recapfile: function(el){
+    var f = el.files && el.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      var obj = null; try { obj = JSON.parse(r.result); } catch(e){}
+      el.value = '';
+      var src = obj && typeof obj === 'object' ? (obj.awards && typeof obj.awards === 'object' ? obj.awards : obj) : null, ms = members(), got = {}, n = 0;
+      if (src) Object.keys(src).forEach(function(k){
+        var v = src[k]; if (!v || typeof v !== 'object') return;
+        var m = S.data.members[k] ? {id:k} : ms.filter(function(x){ return String(x.name || '').trim().toLowerCase() === String(k).trim().toLowerCase(); })[0];
+        if (!m) return;
+        var t = String(v.title || '').trim().slice(0, 60), bl = String(v.blurb || '').trim().slice(0, 600);
+        if (!t && !bl) return;
+        got[m.id] = {title:t, blurb:bl}; if (v.icon && AW_ICON[v.icon]) got[m.id].icon = v.icon; n++;
+      });
+      var note = obj && typeof obj.note === 'string' ? obj.note.trim().slice(0, 600) : null;
+      if (!n && !note) { toast('No award texts for this group\'s people in that file.'); return; }
+      mutate('meta', 'recap', function(doc){ doc = doc || {}; doc.awards = Object.assign({}, doc.awards || {}, got); if (note !== null) doc.note = note; return doc; });
+      toast('Loaded ' + n + ' award text' + (n === 1 ? '' : 's'));
+    };
+    r.onerror = function(){ toast("Couldn't read that file."); };
+    r.readAsText(f);
+  },
   impwho: function(el){ S.impWho = el.value; },
   impweek: function(el){ S.impWeek = +el.value; },
   restorefile: function(el){
@@ -1686,7 +2364,7 @@ var F = {
   },
   setup: function(f){
     var names = f.names.value.split(/\n|,/).map(function(s){ return s.trim(); }).filter(Boolean);
-    save('meta', 'settings', {title: f.title.value.trim() || 'Friends Workout', startDate: f.start.value, length: clamp(parseInt(f.length.value,10) || 28, 1, 366)});
+    save('meta', 'settings', {title: f.title.value.trim() || 'Friends Workout', startDate: f.start.value, length: clamp(parseInt(f.length.value,10) || 28, 1, 366), theme:'fall', rules:2});
     var taken = Object.assign({}, S.data.members), base = members().length;
     names.forEach(function(n, k){ var id = uniqueId(n, taken, 'm'); taken[id] = 1; save('members', id, {name:n, color:(base + k) % NCOL, order:base + k, plan:[], log:{}, base:f.start.value}); });
     toast('Board created');
@@ -1707,6 +2385,16 @@ var F = {
     }
     if (Object.keys(fields).length) patch('meta', 'settings', fields);
     S.noKeep = 'settings'; render(); toast(Object.keys(fields).length ? 'Challenge saved' : 'Nothing changed');
+  },
+  award: function(f){
+    var id = f.dataset.id, t = f.title.value.trim().slice(0, 60), bl = f.blurb.value.trim().slice(0, 600);
+    S.editAward = null; S.noKeep = 'aw-' + id;
+    mutate('meta', 'recap', function(doc){ doc = doc || {}; doc.awards = doc.awards || {}; if (t || bl) doc.awards[id] = Object.assign({}, doc.awards[id] || {}, {title:t, blurb:bl}); else delete doc.awards[id]; return doc; });
+  },
+  nextch: function(f){
+    if (S.nextBusy || S.mode !== 'firebase' || !S.store) return;
+    var title = f.title.value.trim() || 'Friends Workout', start = f.start.value || todayStr(), L2 = clamp(parseInt(f.length.value, 10) || len(), 1, 366);
+    startNext(title, start, L2);
   },
   addmember: function(f){
     var n = f.name.value.trim(); if (!n) return;
@@ -1749,6 +2437,12 @@ document.addEventListener('change', markDirty, true);
 document.addEventListener('submit', function(e){ var f = e.target; if (f.dataset && f.dataset.form) { e.preventDefault(); if (F[f.dataset.form]) F[f.dataset.form](f); } });
 
 /* ---------- boot ---------- */
+window.addEventListener('hashchange', function(){
+  var m = (location.hash || '').match(/^#k=([A-Za-z0-9_-]{20,64})$/);
+  if (!m) return;
+  if (S.mode === 'firebase' && m[1] !== groupKeyMem) { setGroupKey(m[1]); location.reload(); }
+  else if (S.mode === 'nogroup') { setGroupKey(m[1]); startFirebase(); }
+});
 function startFirebase(){
   var k = groupKey();
   if (!k) { S.mode = 'nogroup'; render(); return; }
