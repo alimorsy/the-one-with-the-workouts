@@ -391,6 +391,25 @@ button.srow:first-child{border-top:0}
 :root[data-skin="fall"] body{background:transparent}
 :root[data-skin="fall"] #scene{display:block;position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 45%,var(--sky3) 100%)}
 #scene svg{position:absolute;display:block}
+/* Optional photo instead of the drawn scene: a portrait file for tall screens, a landscape one for wide ones, under a veil
+   in the page color (stronger at the top and bottom, where the day header and the tab bar sit). */
+.sc-photo{display:none;position:absolute;inset:0;background:var(--bg-l) center/cover no-repeat}
+@media (max-aspect-ratio:1/1){ .sc-photo{background-image:var(--bg-p)} }
+#scene.photo .sc-photo{display:block}
+#scene.photo > svg,#scene.photo .sc-sun{display:none}
+#scene.photo::after{content:"";position:absolute;inset:0;opacity:var(--veil,.55);background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 70%,transparent) 38%,color-mix(in srgb,var(--bg) 70%,transparent) 70%,var(--bg) 100%)}
+/* Dark mode dims the photo further so it sits back behind the dark page. */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) #scene.photo::after{opacity:calc(var(--veil,.55) + .22)} }
+:root[data-theme="dark"] #scene.photo::after{opacity:calc(var(--veil,.55) + .22)}
+/* With a photo, the content column is frosted (blurred and lightly tinted): the photo's fine detail is what makes text
+   hard to read, so blurring it keeps the colors and shapes while text on it stays legible. The sides stay sharp on wide screens. */
+:root[data-photo] .wrap,:root[data-photo] .topbar{background:color-mix(in srgb,var(--bg) 42%,transparent);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
+/* Wide screens: the tab bar sits on the top edge of the column at the column's width, so it reads as part of it. */
+@media (min-width:760px){ :root[data-photo] .nav{max-width:680px;margin-inline:auto;background:color-mix(in srgb,var(--bg) 80%,transparent)} }
+/* Tall screens: the portrait file is already softened, so phones skip the live blur (cheaper while the leaves fall). */
+@media (max-aspect-ratio:1/1){ :root[data-photo] .wrap,:root[data-photo] .topbar{background:color-mix(in srgb,var(--bg) 50%,transparent);-webkit-backdrop-filter:none;backdrop-filter:none} }
+.credit{margin-top:32px;font-size:.75rem;color:var(--muted);text-align:center;text-wrap:balance}
+.credit a{color:inherit}
 .sc-sun{position:absolute;right:9%;top:13%;width:min(30vmin,240px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--sun) 0 52%,transparent 71%);opacity:.75}
 .sc-hills{left:0;bottom:0;width:100%;height:40vh}
 .sc-tree.l{left:max(-60px,calc(50% - 560px));bottom:15vh;height:min(50vh,470px);width:auto;aspect-ratio:240/330}
@@ -411,6 +430,7 @@ button.srow:first-child{border-top:0}
 </style>
 
 <div id="scene" aria-hidden="true">
+  <div class="sc-photo"></div>
   <div class="sc-sun"></div>
   <svg class="sc-hills" viewBox="0 0 400 200" preserveAspectRatio="none">
     <path class="h1" d="M0 62C55 34 118 40 176 58C236 77 302 30 400 48V200H0Z"/>
@@ -1063,6 +1083,22 @@ function syncMode(){
   if (views().indexOf(S.view) < 0) S.view = fz ? 'recap' : 'board';
 }
 function skinKey(){ return 'fw.skin:' + (S.mode === 'firebase' ? (groupKey() || '') : S.mode); }
+/* Fall background photo (null = the drawn scene): portrait and landscape files in bg/, the veil strength (0-1), and the
+   credit line shown at the bottom of every page while it's in use. Made with tools/make_bg.py. */
+var FALL_BG = {p:'bg/levitan-p.webp', l:'bg/levitan-l.webp', veil:.5,
+  credit:[['Isaac Levitan, ', null], ['Golden Autumn', 'https://en.wikipedia.org/wiki/Golden_Autumn'], [' (1895), public domain, via ', null], ['Wikimedia Commons', 'https://commons.wikimedia.org/wiki/File:Levitan_Zolotaya_Osen.jpg']]};
+function applyBg(on){
+  var sc = document.getElementById('scene'), b = on ? FALL_BG : null, key = b ? b.l : '';
+  if (!sc || sc.getAttribute('data-bg') === key) return;
+  sc.setAttribute('data-bg', key); sc.classList.toggle('photo', !!b);
+  if (b) document.documentElement.setAttribute('data-photo', ''); else document.documentElement.removeAttribute('data-photo');
+  if (b) { sc.style.setProperty('--bg-p', 'url("' + b.p + '")'); sc.style.setProperty('--bg-l', 'url("' + b.l + '")'); sc.style.setProperty('--veil', String(b.veil == null ? .55 : b.veil)); }
+}
+function creditHtml(){
+  var b = settings() && skin() === 'fall' ? FALL_BG : null;
+  if (!b || !b.credit) return '';
+  return '<p class="credit">Background: ' + b.credit.map(function(x){ return x[1] ? '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>' : esc(x[0]); }).join('') + '</p>';
+}
 function applySkin(){
   var sk = settings() ? skin() : LS.get(skinKey()), root = document.documentElement;
   if (sk === 'fall') root.setAttribute('data-skin', 'fall'); else root.removeAttribute('data-skin');
@@ -1073,6 +1109,7 @@ function applySkin(){
   }
   if (settings()) LS.set(skinKey(), sk === 'fall' ? 'fall' : null);   /* remembered so the next load starts in the right look */
   leaves(sk === 'fall' && LS.get('fw.leaves') !== 'off');
+  applyBg(sk === 'fall');
 }
 function render(){
   syncMode(); applySkin();
@@ -1097,7 +1134,7 @@ function render(){
   else if (S.view === 'leaders') html = viewLeaders();
   else if (S.view === 'recap') html = viewRecap();
   else html = viewBoard();
-  $app.innerHTML = html;
+  $app.innerHTML = html + creditHtml();
   var noKeep = S.noKeep; S.noKeep = null;
   $app.querySelectorAll('[data-keep]').forEach(function(box){
     var k = box.getAttribute('data-keep');
